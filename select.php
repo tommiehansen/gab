@@ -202,7 +202,7 @@
 		?>
 
 	<section>
-		<button class="button-outline small right" onclick="ajax.get('./system/clear_cache.php?clearcache=yes','Cache was cleared.<br>Reload the page to get new datasets etc');return false;">Clear cache</button>
+		<button class="button-outline small right tip" rel="New data? Clear the cache and reload the page." onclick="ajax.get('./system/clear_cache.php?clearcache=yes','Cache was cleared.<br>Reload the page to get new datasets etc');return false;">Clear cache</button>
 	</section>
 
 	<section id="datasets">
