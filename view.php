@@ -98,13 +98,13 @@
                         $html .= "
                             <tr>
                                 <th>Exchange</th>
-                                <th>Asset</th>
-                                <th>Currency</th>
+                                <th>A</th>
+                                <th>C</th>
                                 <th>From</th>
                                 <th>To</th>
                                 <th>Strategy</th>
                                 <th>Size</th>
-                                <th>Last run</th>
+                                <th>Last change</th>
                             </tr>
                         ";
                         $html .= "</thead><tbody>";
@@ -126,7 +126,13 @@
                             <td>$from</td>
                             <td>$to</td>
                             <td>$strategy</td>
-                            <td>$filesize <a class='button button-outline small right tip clean $cleanClass' rel='Cleans the results table and keeps 500 most profitable runs'>CLEAN</a></td>
+                            <td>
+                                <i>$filesize</i>
+                                <div class='right'>
+                                    <a class='button button-outline small tip clean $cleanClass' rel='Cleans the results table and keeps 500 most profitable runs'>CLEAN</a>
+                                    <a class='button button-outline small tip red remove' rel='Remove this result set'>R</a>
+                                </div>
+                            </td>
                             <td>$date</td>
                         </tr>
                     ";
@@ -506,24 +512,49 @@ results.on('click', 'tr', function(){
 })
 
 
-/* clean table */
-results.on('click', '.clean', function(e){
+/* clean / remove table */
+results.on('click', 'a', function(e){
     e.preventDefault(); e.stopPropagation();
 
     let t = $(this),
-        rel = t.parents('tr').attr('rel'),
-        copy = t[0].outerHTML;
+        tr = t.parents('tr'),
+        rel = tr.attr('rel'), // db filename
+        prevText = t.text();
 
     t.text('WAIT..')
     .addClass('button-secondary')
     .removeClass('button-outline');
 
+    if( t.is('.remove') ){
+        //alert('remove');
+        var c = confirm('Sure? This will remove all data.');
 
-    ajax.get('system/clean_db.php?id=' + rel, 'DB was cleaned', function(data){
-        t.parent()
-            .text(data)
-            .append(copy);
-    });
+        if( c ){
+            ajax.get('system/remove_db.php?id=' + rel, 'DB removed', function(data){
+                console.log(data);
+                tr.next('tr').trigger('click'); // select next in line since this will get removed
+                tr.remove();
+                t.text(prevText)
+                .removeClass('button-secondary')
+                .addClass('button-outline'); // reset
+            });
+        }
+        else {
+            t.text(prevText)
+            .removeClass('button-secondary')
+            .addClass('button-outline'); // reset
+        }
+    }
+
+    // not remove..
+    else {
+        ajax.get('system/clean_db.php?id=' + rel, 'DB was cleaned', function(data){
+            t.parent().find('i').text(data);
+            t.text(prevText)
+            .removeClass('button-secondary')
+            .addClass('button-outline'); // reset
+        });
+    }
 
 })
 

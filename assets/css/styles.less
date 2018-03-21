@@ -138,7 +138,7 @@ input[type=submit].on {
     &.small {
         height: @spacing;
         line-height: @spacing;
-        padding-left: @spacing-half; padding-right: @spacing-half;
+        padding-left: @spacing-half/2; padding-right: @spacing-half/2;
     }
     &.red {
         border-color: @red-500;
@@ -415,7 +415,6 @@ body,html { height: 100%; }
         background: @colors;
         color: @color-secondary-white;
         border-radius: @border-radius;
-        border-color: 1px solid @color-primary-dark;
         pointer-events: none;
 
         padding: @spacing;
@@ -451,4 +450,5 @@ body,html { height: 100%; }
         transition-duration: .05s;
         transition-delay: 0;
     }
+
 }
