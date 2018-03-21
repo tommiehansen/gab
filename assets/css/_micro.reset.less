@@ -1,0 +1,32 @@
+// micro reset css
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-collapse: collapse;
+    border-spacing: 0;
+    outline: none;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+    list-style: none;
+    quotes: none;
+}
+
+// html5
+footer, header, hgroup, menu, nav, section, small {
+  display: block;
+}
+
+// no quotes
+blockquote:before, blockquote:after, q:before, q:after {
+  content: '';
+  content: none;
+}
+
+// fix em
+em { font-style: italic; }
+
+// box sizing
+html { box-sizing: border-box; }
+*, *:before, *:after { box-sizing: inherit; }

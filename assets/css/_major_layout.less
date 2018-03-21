@@ -1,0 +1,74 @@
+/*------------------------------------------------------
+
+    # MAJOR LAYOUT
+
+------------------------------------------------------*/
+
+
+// defaults
+section {
+    margin: @spacing-quad auto;
+    padding: 0 @spacing-half;
+    max-width: 100%;
+    column, row { display: block; }
+    column { margin-bottom: @spacing; }
+    .no-gutter column { margin-bottom: 0; }
+}
+
+@media( min-width: 300px ){
+    body > section { margin-top: @spacing-double; }
+}
+
+@media( min-width: 500px ){
+
+    // section
+    section {
+        width: 100%;
+        max-width: @container-width;
+    }
+
+    body > section { margin-top: @spacing-quad; }
+
+    /* flexbox grid */
+    @gutter: @spacing;
+    section {
+
+        padding-left: @gutter;
+        padding-right: @gutter;
+
+    	row {
+            display: flex;
+            margin: 0 -@gutter;
+
+    		column {
+                display: block;
+                margin: @gutter;
+                flex: 1; // ie11 require flex-basis
+                flex-grow: 1;
+                flex-basis: 0;
+            }
+
+            // allow columns to wrap
+            &.flex-wrap {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: flex-wrap;
+                align-items: stretch;
+                align-content: stretch;
+                column {
+                    flex-grow: 1;
+                    flex: 25%;
+                }
+            }
+    	}
+
+    }
+
+
+    // gutter-less
+    .no-gutter {
+        margin-left: 0; margin-right: 0;
+        column { margin-left: 0; margin-right: 0; }
+    }
+
+}

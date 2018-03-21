@@ -1,0 +1,48 @@
+/*-----------------------------------------------------
+
+	# FORMS
+
+-----------------------------------------------------*/
+
+form {
+
+    @space: @spacing/1.25;
+
+    label, input, textarea, select {
+        width: 100%;
+        padding: @space;
+    }
+
+    input, textarea, select {
+        border: 1px solid #ddd;
+        border-radius: @border-radius;
+        font-size: @font-size-normal;
+        line-height: @font-line-height;
+    }
+
+    label {
+        padding: 0 0 @space 0;
+        display: block;
+    }
+
+    // reset button and submit
+    input[type=button], input[type=submit] {
+        width: auto;
+    }
+
+    input[type=checkbox], input[type=radio] {
+        width: auto; padding: 0; border: 0; border-radius: 0; // reset previous
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    textarea { min-height: 20rem; }
+
+    // hovers
+    input, textarea, select {
+        &:focus {
+            border-color: @color-primary;
+        }
+    }
+
+}

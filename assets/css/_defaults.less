@@ -1,0 +1,25 @@
+/*------------------------------------------------------
+
+    # LARGE DEFAULTS
+
+------------------------------------------------------*/
+
+html { font-size: 62.5%; }
+body {
+    font-family: @font;
+    font-weight: @font-normal;
+    font-size: @font-size-normal;
+    line-height: 1;
+    color: @color-dark;
+    padding: @spacing-double 0 @spacing-double*4 0;
+    background: @color-brightest;
+}
+
+a {
+    color: @color-primary;
+    &:hover { color: @color-primary-darker; }
+}
+
+img { display: inline-block; }
+
+section + section { margin-top: @spacing-double; }

@@ -1,0 +1,77 @@
+/*------------------------------------------------------
+
+    # CENTER VERTICAL
+
+------------------------------------------------------*/
+
+.center-vertical {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    width: 100%;
+    height: 50rem;
+    margin-bottom: @spacing;
+
+    .abs { position: absolute; }
+    .top { top: 0; }
+    .bottom { bottom: 0; }
+    .left { left: 0; }
+    .right { right: 0; }
+
+    &.fullscreen { height: 100vh; }
+
+}
+
+
+// styling -- unrelated
+.center-vertical.demo2 {
+    background: linear-gradient(-225deg, @indigo-400, @pink-300);
+    color: rgba(255,255,255,0.8);
+    h1,h2 { color: #fff; margin-top: 0; }
+    h3 { color: #fff; }
+}
+.center-vertical.demo {
+    background: @color-white;
+    box-shadow: inset 0 0 @spacing-quad*2 rgba(0,0,0,0.1);
+
+    &.fullscreen {
+        box-shadow: 0 0 0;
+        background: @light-blue-50;
+        background: linear-gradient(-225deg, @light-blue-100, @pink-50);
+    }
+
+    .abs {
+        opacity:0;
+        transform: scale(0.8);
+        transition: all .5s ease;
+        transition-delay: .1s;
+        margin: @spacing-double;
+        text-transform: uppercase;
+        color: @color-bright;
+        font-size: @font-size-smaller;
+        @w: 7rem;
+        height: @w; width: @w; line-height: @w;
+        border-radius: @border-radius-circle;
+        text-align: center;
+        background: @color-bright;
+        color: #fff;
+    }
+    .left, .right { margin-top:0; margin-bottom:0; }
+    .top, .bottom { margin-left:0; margin-right: 0; }
+
+    .left { background: @red-400 }
+    .right { background: @amber-500 }
+    .top { background: @blue-400 }
+    .bottom { background: @green-400 }
+
+    &:hover {
+        .abs { opacity: 1; transform: none; }
+        .inner { opacity: .5; transform: scale(0.9); }
+    }
+
+    .inner{ transition: all .2s ease; }
+    h2 { margin-top: 0; }
+    p { color: @color-bright; margin-bottom: 0; }
+}

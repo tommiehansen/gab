@@ -1,0 +1,73 @@
+/*------------------------------------------------------
+
+    # CARD
+
+------------------------------------------------------*/
+
+
+.card {
+
+    background: @color-white;
+    border-radius: @border-radius-small;
+    overflow: hidden; // NOTE: this has to do with rounded corners
+    margin-bottom: @spacing-double;
+
+    &.has-border { border: .1rem solid @color-brighter; } // make this an optional global styling attribute
+    &.has-shadow { box-shadow: 0 0 @spacing rgba(0,0,0,0.05); } // make this an optional global styling attribute
+    &.has-large-border {
+        @border: .5rem solid @color-primary;
+        &.top { border-top: @border; }
+        &.bottom { border-bottom: @border; }
+        &.left { border-left: @border; }
+        &.right { border-right: @border; }
+    }
+
+    .inner {
+        > h1,h2,h3,h4,h5,h6 { margin-top: 0; }
+        padding: @spacing*1.5;
+        row + .footer { margin-top:0; }
+    }
+
+    .subtitle {
+        margin: 0 0 @spacing;
+        color: @color-bright;
+    }
+
+    &.is-large .inner { padding: @spacing-double; }
+
+    .footer {
+        margin-top: @spacing-double;
+    }
+
+    img { width: 100%; height: auto; }
+
+
+    &.poster {
+        min-height: 55rem;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        color: @color-white;
+        position:relative;
+        h2,h3,h4,h5,h6 { color: @color-white; font-weight: 400; }
+        .subtitle { color: @color-white; opacity: .8; letter-spacing: .1rem; font-size: @font-size-smaller; text-transform: uppercase;}
+        .inner {
+            position: absolute; bottom: 0; left:0; z-index:10;
+            background-image: linear-gradient(to top, black, rgba(0,0,0,0.5), transparent);
+            text-shadow: .1rem .1rem 0 rgba(0,0,0,0.3);
+            p:last-of-type { margin-bottom: 0; }
+        }
+        &:after {
+            content: '';
+            display:block; position:absolute; top:0;left:0; height:100%;width:100%;
+            background: #000;
+            opacity: .3;
+            transition: opacity .2s ease;
+        }
+
+        &:hover:after { opacity:0; }
+    }
+}
+
+// rm margin from rows
+row .card { margin-bottom: 0; }
