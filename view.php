@@ -549,7 +549,7 @@ results.on('click', 'a', function(e){
     // not remove..
     else {
         ajax.get('system/clean_db.php?id=' + rel, 'DB was cleaned', function(data){
-            t.parent().find('i').text(data);
+            t.parent().parent().find('i').text(data);
             t.text(prevText)
             .removeClass('button-secondary')
             .addClass('button-outline'); // reset
