@@ -245,6 +245,9 @@
 	<section>
 		<!-- SUBMIT -->
 		<input type="submit" value="RUN IT!" id="submit" class="button-large">
+
+		<!-- DEBUG -->
+		<button id="debug" class="button-large button-outline tip" data-debug="false" data-tip="Do a fake run where you see all the dynamic params change 500 times">DEBUG</button>
 	</section>
 
 

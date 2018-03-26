@@ -104,7 +104,7 @@ datasets.find(':checked').parents('tr').addClass('checked');
 
 /* CLEAR LOGS */
 $('#log_clear').on('click', function(){
-    $('#logs')[0].innerText = '';
+    $('#logs').text('').addClass('hidden');
 })
 
 /* ----------------------------
@@ -113,13 +113,15 @@ $('#log_clear').on('click', function(){
 
 ---------------------------- */
 
-// globals (evil)
+// evil
 var runCount = 0,
     noResultRuns = 0,
     xhrPool = [],
     intervalCounter = null,
     elapsedTime = 0,
-    stopAll = false;
+    stopAll = false,
+    logLineLength = 50,
+    maxNoResultsRuns = 100;
 
 $(document).ajaxSend(function(e, jqXHR, options){
     xhrPool.push(jqXHR);
@@ -138,6 +140,19 @@ window.abortAllAjaxRequests = function() {
 let f = $('#gab_selectForm');
 let log_duration = $('#log_duration');
 
+// debug
+f.on('click', '#debug', function(e){
+    e.preventDefault();
+    let $t = $(this);
+    $t.data('debug','true');
+    f.trigger('submit');
+
+    // reset
+    setTimeout(function(){
+        $t.data('debug','false');
+    }, 150);
+})
+
 f.on('submit', function(e){
     e.preventDefault();
 
@@ -145,10 +160,16 @@ f.on('submit', function(e){
     var serialized = $(this).serialize(),
         form_url = $(this).prop('action'),
         timeout = $('#ajax_timeout')[0].value * 60000,
-        maxNoResultsRuns = 100,
         noResultRuns = 0, // reset
         threads = f.find('#threads')[0].value,
         sub = $('#submit');
+
+    // check if debug mode
+    if( $('#debug').data('debug') === 'true' ){
+        serialized += '&debug=true';
+        logLineLength = 1000;
+        maxNoResultsRuns = 500;
+    }
 
     sub.blur();
 
@@ -246,8 +267,8 @@ function jax_multi(form_url, serial, timeout, maxNoResultsRuns ){
                 // check if no. of pre-lines is too massive and cut..
                 let lines = logs.html().split('\n');
                 let preLen = lines.length;
-                if( preLen > 50 ){
-                    lines = lines.splice(0,50);
+                if( preLen > logLineLength ){
+                    lines = lines.splice(0, logLineLength);
                     lines = lines.join('\n');
                     logs.html(lines);
                 }

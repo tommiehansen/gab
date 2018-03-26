@@ -27,8 +27,11 @@
     $strat = _P('strat');
     $candle_size = _P('candle_size');
     $history_size = _P('history_size');
+    $debug = _P('debug');
 
-
+    // check if debug mode
+    if( $debug === 'true' ){ $debug = true; }
+    else { $debug = false; }
 
     /* LOOP LINES IN TOML */
     $lines = preg_split("/((\r?\n)|(\r\n?))/", $params);
@@ -132,6 +135,15 @@
     }
 
     #prp($candle_size); exit;
+
+    // debug
+    if( $debug )
+    {
+        $str = "\n<u class='bad'>Candle size</u> <u class='yellow'>$candle_size</u>\n";
+        $str .= "<u class='bad'>Strategy</u>\n<u class='yellow'>" . $new . '</u>';
+        echo $str;
+        exit;
+    }
 
     if( $hasError )
     {
