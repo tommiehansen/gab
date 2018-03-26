@@ -1,9 +1,15 @@
-# GAB
+# **GAB**
 Gekko Automated Backtests
 
 *** **THIS IS ALPHA, ANYTHING BREAKING MIGHT CHANGE AT ANY GIVEN TIME** ***
 
 If something does not work, it simply does not work since time hasn't existed yet to get it working.
+
+###### Breaking changes
+26/3 2018
+Cleaned up most stuff and optimized many more + added a lot of things 'under the hood'. A lot of changes and changes to things such as the databases etc. This make this a version _incompatible_ with the prior (first released) version.
+
+If you want to keep your old results copy your old `gab` folder to somewhere else and then clone this repo again.
 
 #### Why
 I needed a way to run backtests for Gekko in a 'brute-force' manor automated and with multi-threading.
