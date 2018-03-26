@@ -20,7 +20,7 @@
 
     # 'global' params
     $setup = (object) [];
-    $setup->limit = _G('limit') ? _G('limit') : 20;
+    $setup->limit = _G('limit') ? _G('limit') : 10;
     $setup->order = _G('order') ? _G('order') : 'strategy_profit';
 
 ?>
@@ -138,7 +138,7 @@
 		        <row>
 		            <column>
 		                <label for="limit">Use Top X runs for averages and list</label>
-		                <input type="number" id="limit" pattern="[0-9]*" max="10000" min="2" name="limit" placeholder="Number of runs to show, default: 50" value="<?= $setup->limit ?>">
+		                <input type="number" id="limit" pattern="[0-9]*" max="10000" min="2" name="limit" placeholder="Number of runs to show, default: 10" value="<?= $setup->limit ?>">
 		            </column>
 		            <column>
 		                <label for="order">Order results by</label>
