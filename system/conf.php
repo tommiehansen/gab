@@ -3,7 +3,6 @@
 	/* core */
 	$server = 'http://localhost:3000/api/';
 
-
 	/* general conf */
 	# cache
 	$conf['cache'] = [
@@ -11,7 +10,6 @@
 		'caching' => true,
 		'cacheTime' => '6 hours',
 	];
-
 
 	# endpoints
 	$conf['endpoints'] = [
@@ -25,24 +23,68 @@
 	];
 
 
+
+	/* dirs */
+	$domain = $_SERVER['HTTP_HOST'];
+	$docRoot = $_SERVER['DOCUMENT_ROOT'];
+	$dirRoot = dirname(__FILE__);
+	$protocol = isset($_SERVER["HTTPS"]) ? 'https://' : 'http://';
+	$base_url = $protocol . $domain . substr(__DIR__, strlen($_SERVER[ 'DOCUMENT_ROOT' ])) . '/';
+	$base_url = str_replace('system/', '', $base_url);
+
+	$base_path = $docRoot . "/gab/";
+
+
 	# system dirs
 	$conf['dirs'] = [
-		'system' => 'system/',
-		'results' => 'results/',
-		'cache' => $conf['cache']['cache_dir'],
-		'logs' => 'logs/',
+		'base' => $base_path,
+		'system' => $base_path . 'system/',
+		'results' => $base_path . 'results/',
+		'views' => $base_path . 'views/',
+		'cache' => $base_path . $conf['cache']['cache_dir'],
 	];
 
-	/* allow config changes from UI */
+	$dirs = (object) $conf['dirs'];
 
-	# disable caching
-	if( isset($_GET['recache']) && $_GET['recache'] == 1 || !$conf['cache']['caching'] )
-	{
-		$conf['cache']['cacheTime'] = '1 second';
-	}
+	$conf['urls'] = [
+		'system' => $base_url . 'system/',
+		'results' => $base_url . 'results/',
+		'assets' => $base_url . 'assets/',
+	];
+
+	# db fields
+	$conf['db_fields'] = [
+
+		'blobs' => [
+			'id' => 'TEXT PRIMARY KEY UNIQUE',
+			'report' => 'BLOB',
+			'roundtrips' => 'BLOB',
+		],
+
+		'results' => [
+			'id' => 'TEXT PRIMARY KEY UNIQUE',
+			'candle_size' => 'INTEGER',
+			'strategy_profit' => 'INTEGER',
+			'market_profit' => 'INTEGER',
+			'sharpe' => 'REAL',
+			'alpha' => 'REAL',
+			'trades' => 'INTEGER',
+			'trades_win' => 'INTEGER',
+			'trades_lose' => 'INTEGER',
+			'trades_win_percent' => 'REAL',
+			'trades_win_avg' => 'REAL',
+			'trades_lose_avg' => 'REAL',
+			'trades_best' => 'REAL',
+			'trades_worst' => 'REAL',
+			'trades_per_day' => 'REAL',
+			'strat' => 'BLOB',
+		],
+	];
 
 	// turn to object
 	$conf = json_decode(json_encode($conf));
+
+
 
 
 	/* set large defaults for PHP */

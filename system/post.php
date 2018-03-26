@@ -8,31 +8,19 @@
         $params: json
     */
 
-    /* set large defaults for PHP */
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-    ini_set('memory_limit','512M');
-    set_time_limit(3600);
-
     if( !$_POST ) {
         die('There was no _POST set');
     }
 
-
-
     # init
-    require_once 'system/conf.php';
-    require_once 'system/functions.php';
-    require_once 'system/class.gab.php';
+    require_once 'conf.php';
+    require_once $conf->dirs->system . 'functions.php';
+    require_once $conf->dirs->system . 'class.gab.php';
     $gab = new \GAB\core($conf);
 
     /*
         COMPILE STRATEGY FROM RANGE-SETTINGS
     */
-
-    #echo 'run: ' . date('h:m:s');
-    #prp($_POST);
-    #exit;
 
     $dataset = _P('dataset');
     $params = _P('toml');
@@ -40,7 +28,9 @@
     $candle_size = _P('candle_size');
     $history_size = _P('history_size');
 
-    # loop all lines
+
+
+    /* LOOP LINES IN TOML */
     $lines = preg_split("/((\r?\n)|(\r\n?))/", $params);
     $new = '';
     $hasError = false;
@@ -72,11 +62,16 @@
             }
 
             // generate entire range
-            $range = range(0, $max, $step);
+            if( $min > 0 ){
+                $range = range(0, $max, $step);
+            }
+            else {
+                $range = range($min, $max, $step);
+            }
 
             // ..then remove all under $min
             foreach( $range as $key => $val ){
-                if($range[$key] < $min ) unset($range[$key]);
+                if($val < $min ) unset($range[$key]);
             }
 
             // ...and add back $min
@@ -99,10 +94,11 @@
         }
     }
 
-    #prp( $new );
+    #prp( $new ); exit;
 
-    /* candle */
-    if( contains(':', $candle_size) ){
+    # candle size
+    if( contains(':', $candle_size) )
+    {
 
         $vals = rmspace( $candle_size );
         $vals = str_replace(',', ':', $vals); // make all separators : for simplicy
@@ -130,6 +126,8 @@
 
     }
 
+    #prp($candle_size); exit;
+
     if( $hasError )
     {
         echo '<p>There were errors <br>';
@@ -142,6 +140,7 @@
 
     // no errors
     else {
+
         # take new string and generate array (from toml)
         try {
 
@@ -152,7 +151,7 @@
             $q['candle_size'] = $candle_size;
             $q['history_size'] = $history_size;
 
-            #prp($q);
+            #prp($q); exit;
 
             $domain = $_SERVER['HTTP_HOST'];
             $prefix = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';

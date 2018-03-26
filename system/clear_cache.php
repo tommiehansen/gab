@@ -6,8 +6,7 @@ require_once 'functions.php';
 if( _G('clearcache') === 'yes' )
 {
     require_once 'conf.php';
-    $base_dir = '../';
-    $files = listFiles( $base_dir . $conf->dirs->cache );
+    $files = listFiles( $conf->dirs->cache );
 
     if( !is_array($files) ) {
         echo 'No cached files';
@@ -18,7 +17,7 @@ if( _G('clearcache') === 'yes' )
     {
         // make sure it contains .cache extension
         if(contains('.cache', $file)) {
-            unlink( $base_dir . $conf->dirs->cache . $file );
+            unlink( $conf->dirs->cache . $file );
         }
         else {
             continue;

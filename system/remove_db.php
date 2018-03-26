@@ -1,6 +1,7 @@
 <?php
 /* delete database */
-require_once 'functions.php';
+require_once 'conf.php';
+require_once $conf->dirs->system . 'functions.php';
 
 $id = _G('id');
 
@@ -17,8 +18,7 @@ if( $id && contains('.db', $id))
     $file = str_replace(';','', $file);
 
     # set src
-    require_once 'conf.php';
-    $result_dir = '../' . $conf->dirs->results;
+    $result_dir = $conf->dirs->results;
     $db_src = $result_dir . $file;
 
     # not allowed to delete dirs

@@ -5,20 +5,14 @@ class core {
 
 	function __construct( $conf )
 	{
-		# requires
-		require_once 'functions.php';
-
 		# vars
 		$this->conf = $conf;
 		$this->endpoints = $conf->endpoints;
 		$this->cache = $conf->cache;
 
-		# libs
-		require_once $this->conf->dirs->system . 'class.toml.php';
-
-		# TEMP: always clear all
-		#$this->clear_cache( $conf->cache->cache_dir );
-		#$this->clear_cache( $conf->dirs->results );
+		# requires
+		require_once $conf->dirs->system . 'functions.php';
+		require_once $conf->dirs->system . 'class.toml.php';
 
 		$this->init();
 
@@ -30,12 +24,12 @@ class core {
 	private function init(){
 
 		/* auto create folders if not exist */
-		$cache = $this->conf->cache;
-		if(!file_exists($cache->cache_dir))
+		$dir = $this->conf->dirs->cache;
+		if(!file_exists($dir))
 		{
 			#prp('created dir: ' . $cache->cache_dir);
-			mkdir($cache->cache_dir, 0755, true);
-			file_put_contents( $cache->cache_dir . '.gitignore', ''); # create emtpy .gitignore
+			mkdir($dir, 0755, true);
+			file_put_contents( $dir . '.gitignore', ''); # create emtpy .gitignore
 		}
 
 		$results_dir = $this->conf->dirs->results;
@@ -88,15 +82,15 @@ class core {
 	}
 
 	/**
-	 *  @brief Get strategy
+	 *  Get strategy
 	 *
 	 *  @param [string] $name Name for strategy
-	 *  @return Returns array with strategy name and TOML-string or fals if no match
+	 *  @return Returns array with strategy name and TOML-string or fails if no match
 	 *
 	 */
 	public function get_strategy( $name )
 	{
-		$strats = $this->get( $this->endpoints->strategies, 'strategies' );
+		$strats = $this->get( $this->endpoints->strategies, 'strategy.cache' );
 
 		$match = false;
 
@@ -122,6 +116,59 @@ class core {
 		return $data;
 	}
 
+	/**
+	 *  Strategy average
+	 *
+	 *  @param [array] $arr Array of strategies
+	 *  @return Returns Array with strategy average
+	 *
+	 */
+	public function strategy_average( $arr, $rounding = true )
+	{
+
+		# create array + get total
+		$avg = [];
+		$total = count($arr);
+
+		# first get totals
+		foreach( $arr as $index => $arr )
+		{
+			foreach( $arr as $key => $val )
+			{
+				if( is_array($val) ){ // sub array -- TOML has a max of 1x subarray
+					foreach( $val as $k => $v )
+					{
+						@$avg[$key][$k] += $v; // TODO: fix undefined index...
+					}
+				}
+				else {
+					@$avg[$key] += $val;
+				}
+			}
+
+		} // foreach()
+
+		# ..then calculate average
+		foreach( $avg as $key => $val )
+		{
+			if( is_array($val) ){
+				foreach( $val as $k => $v ){
+					$a = $v / $total;
+					 if( $rounding ) $a = (float) number_format($a, 3);
+					 $avg[$key][$k] = $a;
+				}
+			}
+			else {
+				$a = $val / $total;
+				if( $rounding ) $a = (float) number_format($a, 3);
+				$avg[$key] = $a;
+			}
+		} // foreach()
+
+		return $avg;
+
+	} // strategy_average()
+
 
 	/* other */
 
@@ -134,8 +181,29 @@ class core {
 
 
 	# return TOML from array
-	public function create_toml( $str )
+	public function create_toml( $arr )
 	{
+		$str = '';
+		$nl = "\n";
+		$i = 0;
+
+		foreach( $arr as $key => $val ){
+			if( is_array($val) )
+			{
+				if( $i++ > 0 ) $str .= $nl; // add space before if 2nd, 3rd [title]
+				$str .= "[$key]" . $nl;
+				foreach( $val as $k => $v ){
+					$str .= "$k = $v" . $nl;
+				}
+			}
+			else {
+				$str .= "$key = $val" . $nl;
+			}
+		}
+
+		$str = rtrim($str, "\n\n"); // clean end double space
+
+		return $str;
 
 	}
 
@@ -173,15 +241,6 @@ class core {
 				],
 
 				# strat settings (from get_strategies())
-				/*
-				'TEMA' => [
-					#'__empty' => 0, // empty needed if no TOML-file
-					'short' => 10,
-					'long' => 80,
-					'SMA_long' => 0,
-				],
-				*/
-
 				'tradingAdvisor' => [
 					'enabled' => true,
 					'method' => 'TEMA', # needs to change to strategy name!

@@ -23,9 +23,6 @@
 @import '_buttons.less';
 @import '_forms.less';
 @import '_cards.less';
-//@import '_navigation.less';
-//@import '_menus.less';
-//@import '_center_vertical.less';
 
 
 
@@ -36,18 +33,30 @@
 	# CUSTOMIZE
 
 -----------------------------------------------------*/
+body { overflow-x: hidden; }
+body > section:last-of-type { margin-bottom: @spacing-double * 4; }
 
 .inline { display: inline-block; }
 .right { float: right; }
+hr + h1, hr + h2, hr + h3, hr + h4 { margin-top: 0 }
+hr { padding-top: @spacing-double; margin-bottom: @spacing-double*2; }
 
 // small stuff
 .monospace { font-family: consolas, monospace, mono-space; }
 #toml { font-size: 110%; }
 span.positive { color: @green-500; }
 span.negative { color: @red-500; }
+.w100 { width: 100%; }
 
 button.button-secondary, .button.button-secondary {
     border-color: @color-secondary;
+}
+
+.button-large, input.button-large {
+    padding: @spacing @spacing-double;
+    line-height: @spacing;
+    height: auto;
+    font-size: @font-size-large;
 }
 
 
@@ -221,6 +230,7 @@ pre {
         .bad { color: #FAFAFA; }
         .timestamp, .info { color: hotpink; &:after { content: ' >'; color: #9E9E9E; }}
         .info { color: yellow; }
+        .notice { color: @color-dark }
     }
 
     #log_stat { margin: 0 0 1rem; }
@@ -404,7 +414,7 @@ body,html { height: 100%; }
     // tooltip area
     &:after {
         position: absolute;
-        content: attr(rel);
+        content: attr(data-tip);
         text-transform: none;
         text-align: left;
         letter-spacing: 0;
@@ -451,4 +461,11 @@ body,html { height: 100%; }
         transition-delay: 0;
     }
 
+}
+
+
+/* generator */
+#gen {
+    input { float:left; width: 49%; }
+    input:last-child { float: right; }
 }

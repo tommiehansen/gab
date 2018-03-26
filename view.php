@@ -1,22 +1,21 @@
 <?php
-    $page = 'view';
+	/*
+		GAB
+		view runs
+	*/
+
+	require_once 'system/conf.php';
+	require_once $conf->dirs->system . 'functions.php';
+	require_once $conf->dirs->system . 'class.gab.php';
+
+	$page = 'view';
+	$page_title = 'View runs';
+	require $conf->dirs->views . 'header.php';
+
+	# new instance
+	$gab = new \GAB\core($conf);
 ?>
-<!doctype html>
-<html lang="en-us">
-<head>
-	<title>GAB - Gekko Automated Backtests</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1">
-	<link href="assets/css/styles.css" rel="stylesheet">
-</head>
-<body class="medium">
-<?php include 'system/nav.php' ?>
 <?php
-    /* REQ's */
-    require_once 'system/functions.php';
-    require_once 'system/conf.php';
-    require_once 'system/class.gab.php';
-    $gab = new GAB\core($conf);
 
 
     # 'global' params
@@ -25,231 +24,190 @@
     $setup->order = _G('order') ? _G('order') : 'strategy_profit';
 
 ?>
-        <form action="view.php" type="get">
+        <form action="view.php">
 
             <section id="results">
                 <h3>Select collection of runs</h3>
-                <input type="text" id="filter" placeholder="Type to filter datasets" autofocus="true">
+                <input type="text" id="filter" placeholder="Type to filter datasets">
 
-                <?php
-                    if(_G('clearstatcache') === '1'){
-                        clearstatcache();
-                        echo "<p>Stat cache was cleared.</p>";
-                    }
-                ?>
+	            <?php
+	                _G('db') ? $db = _G('db') : $db = '';
 
-            <?php
-                _G('db') ? $db = _G('db') : $db = '';
+	                $files = listfiles( $conf->dirs->results );
+	                if( !is_array($files) ){ die($files); }
 
-                $files = listfiles( $conf->dirs->results );
-                if( !is_array($files) ){ die($files); }
+	                # pre-process files (add dates etc)
+	                $list = [];
+	                foreach( $files as $key => $dbs )
+	                {
+	                    # must contain .db extension
+	                    if( !contains('.db', $dbs) ) continue;
+	                    $time = filemtime($conf->dirs->results . $dbs);
+	                    $size = filesize($conf->dirs->results . $dbs);
+	                    $list[$key]['name'] = $dbs;
+	                    $list[$key]['last_run'] = $time;
+	                    $list[$key]['filesize'] = sprintf("%4.2f MB", $size/1048576);
+	                }
 
-                # pre-process files (add dates etc)
-                $list = [];
-                foreach( $files as $key => $dbs )
-                {
-                    # must contain .db extension
-                    if( !contains('.db', $dbs) ) continue;
-                    $time = filemtime($conf->dirs->results . $dbs);
-                    $size = filesize($conf->dirs->results . $dbs);
-                    $list[$key]['name'] = $dbs;
-                    $list[$key]['last_run'] = $time;
-                    $list[$key]['filesize'] = sprintf("%4.2f MB", $size/1048576);
-                }
+	                # fix keys
+	                $list = array_values($list);
 
-                # fix keys
-                $list = array_values($list);
+	                # sort by date desc
+	                usort($list, function($a, $b) { return (float) $b['last_run'] - (float) $a['last_run']; });
 
-                # sort by date desc
-                usort($list, function($a, $b) { return (float) $b['last_run'] - (float) $a['last_run']; });
+	                # add date
+	                foreach($list as $k => $v ){
+	                    $list[$k]['date'] = date('Y-m-d H:i', $v['last_run']);
+	                }
 
-                # add date
-                foreach($list as $k => $v ){
-                    $list[$k]['date'] = date('Y-m-d H:i', $v['last_run']);
-                }
+	                #prp($list);
 
-                #prp($list);
+	                $html = '<table class="colored striped sortable"><thead>';
 
-                $html = '<table class="colored striped sortable"><thead>';
+	                foreach( $list as $key => $dbs )
+	                {
+	                    # must contain .db extension
+	                    if( !contains('.db', $dbs['name']) ) continue;
 
-                foreach( $list as $key => $dbs )
-                {
-                    # must contain .db extension
-                    if( !contains('.db', $dbs['name']) ) continue;
+	                    $arr = explode('__', $dbs['name']);
 
-                    $arr = explode('__', $dbs['name']);
+	                    $exchange = ucfirst($arr[0]);
+	                    $asset = strtoupper($arr[1]);
+	                    $currency = strtoupper($arr[2]);
 
-                    $exchange = ucfirst($arr[0]);
-                    $asset = strtoupper($arr[1]);
-                    $currency = strtoupper($arr[2]);
+	                    $fromTo = explode('--', $arr[3]);
+	                    $from = $fromTo[0];
+	                    $to = $fromTo[1];
 
-                    $fromTo = explode('--', $arr[3]);
-                    $from = $fromTo[0];
-                    $to = $fromTo[1];
+	                    $strategy = $arr[4];
+	                    $strategy = str_replace(['_','-','.db'], [' ',' ',''], $strategy);
+	                    $strategy = strtoupper($strategy);
 
-                    $strategy = $arr[4];
-                    $strategy = str_replace(['_','-','.db'], [' ',' ',''], $strategy);
-                    $strategy = strtoupper($strategy);
+	                    $filesize = $dbs['filesize'];
 
-                    $filesize = $dbs['filesize'];
+	                    // table header
+	                    if( $key == 0 ){
+	                        $html .= "
+	                            <tr>
+	                                <th>Exchange</th>
+	                                <th>A</th>
+	                                <th>C</th>
+	                                <th>From</th>
+	                                <th>To</th>
+	                                <th>Strategy</th>
+	                                <th>Size</th>
+	                                <th>Last change</th>
+	                            </tr>
+	                        ";
+	                        $html .= "</thead><tbody>";
+	                    }
 
-                    // table header
-                    if( $key == 0 ){
-                        $html .= "
-                            <tr>
-                                <th>Exchange</th>
-                                <th>A</th>
-                                <th>C</th>
-                                <th>From</th>
-                                <th>To</th>
-                                <th>Strategy</th>
-                                <th>Size</th>
-                                <th>Last change</th>
-                            </tr>
-                        ";
-                        $html .= "</thead><tbody>";
-                    }
-
-                    $name = str_replace('.db', '', $dbs['name']);
-                    $dbsFile = $dbs['name'];
-                    $db_name = $dbs['name'];
-                    $db_name == $db ? $c = 'checked' : $c = '';
-                    if( !$db && $key == 0 ) $c = 'checked';
-                    $date = $dbs['date'];
-                    $input = "<input name='db' value='$db_name' type='radio' $c>";
-                    $cleanClass = $filesize > 70 ? 'red' : '';
-                    $html .= "
-                        <tr class='$c' rel='$dbsFile'>
-                            <td>$input $exchange</td>
-                            <td>$asset</td>
-                            <td>$currency</td>
-                            <td>$from</td>
-                            <td>$to</td>
-                            <td>$strategy</td>
-                            <td>
-                                <i>$filesize</i>
-                                <div class='right'>
-                                    <a class='button button-outline small tip clean $cleanClass' rel='Cleans the results table and keeps 500 most profitable runs'>CLEAN</a>
-                                    <a class='button button-outline small tip red remove' rel='Remove this result set'>R</a>
-                                </div>
-                            </td>
-                            <td>$date</td>
-                        </tr>
-                    ";
-                }
+	                    $name = str_replace('.db', '', $dbs['name']);
+	                    $dbsFile = $dbs['name'];
+	                    $db_name = $dbs['name'];
+	                    $db_name == $db ? $c = 'checked' : $c = '';
+	                    if( !$db && $key == 0 ) $c = 'checked';
+	                    $date = $dbs['date'];
+	                    $input = "<input name='db' value='$db_name' type='radio' $c>";
+	                    $cleanClass = $filesize > 70 ? 'red' : '';
+	                    $html .= "
+	                        <tr class='$c' rel='$dbsFile'>
+	                            <td>$input $exchange</td>
+	                            <td>$asset</td>
+	                            <td>$currency</td>
+	                            <td>$from</td>
+	                            <td>$to</td>
+	                            <td>$strategy</td>
+	                            <td>
+	                                <i>$filesize</i>
+	                                <div class='right'>
+	                                    <a class='button button-outline small tip clean $cleanClass' data-tip='Cleans the results table and keeps 500 most profitable runs'>CLEAN</a>
+	                                    <a class='button button-outline small tip red remove' data-tip='Remove this result set'>R</a>
+	                                </div>
+	                            </td>
+	                            <td>$date</td>
+	                        </tr>
+	                    ";
+	                }
 
 
-                $html .= '</tbody></table>';
-                echo $html;
-            ?>
+	                $html .= '</tbody></table>';
+	                echo $html;
+	            ?>
 
-        <row>
-            <column>
-                <label for="limit">Use Top X runs for averages and list</label>
-                <input type="text" id="limit" maxlength="2" name="limit" placeholder="50" value="<?= $setup->limit ?>">
-            </column>
-            <column>
-                <label for="order">Order results by</label>
-                <?php
-                    $orders = 'strategy_profit,sharpe,trades_win_avg,trades_win_percent,alpha';
-                    $orders = explode(',', $orders);
-                ?>
-                <select name="order">
-                    <?php
-                        foreach($orders as $key => $order){
-                            $checked = '';
-                            if( $setup->order === $order ) $checked = ' selected';
-                            $name = str_replace('_',' ', $order);
-                            $name = str_replace('avg','average', $name);
-                            $name = ucfirst($name);
-                            echo "<option value='$order'{$checked}>$name</option>";
-                        }
-                    ?>
-                </select>
-            </column>
-        </row>
-        <row>
-        <column>
-            <input type="submit" value="Get data"> <button class="button-outline" onclick="window.location.href='view.php?clearstatcache=1';return false;">Clear stat cache</button>
-        </column>
-        </row>
-        </form>
-    </section>
+		        <row>
+		            <column>
+		                <label for="limit">Use Top X runs for averages and list</label>
+		                <input type="number" id="limit" pattern="[0-9]*" max="10000" min="2" name="limit" placeholder="Number of runs to show, default: 50" value="<?= $setup->limit ?>">
+		            </column>
+		            <column>
+		                <label for="order">Order results by</label>
+		                <?php
+		                    $orders = 'strategy_profit,sharpe,trades_win_avg,trades_win_percent,alpha';
+		                    $orders = explode(',', $orders);
+		                ?>
+		                <select name="order">
+		                    <?php
+		                        foreach($orders as $key => $order){
+		                            $checked = '';
+		                            if( $setup->order === $order ) $checked = ' selected';
+		                            $name = str_replace('_',' ', $order);
+		                            $name = str_replace('avg','average', $name);
+		                            $name = ucfirst($name);
+		                            echo "<option value='$order'{$checked}>$name</option>";
+		                        }
+		                    ?>
+		                </select>
+		            </column>
+		        </row>
+		        <row>
+		        <column>
+		            <input type="submit" value="Get data">
+		        </column>
+		        </row>
+
+			</section>
+		</form>
 
 <?php
 
 
     if(_G('db'))
     {
-        $db = _G('db');
+		// get db
+		$db = _G('db');
+		$db_name = $db;
 
         $name = str_replace('.db','', $db);
         $q = explode('__', $name);
 
-        $db = new PDO('sqlite:' .  $conf->dirs->results . $db) or die('Error @ db');
-
-        $list = [
-            'id',
-            'candle_size',
-            'strategy_profit',
-            'sharpe',
-            'alpha',
-            'trades',
-            'trades_win',
-            'trades_lose',
-            'trades_win_percent',
-            'trades_win_avg',
-            'trades_lose_avg',
-            'trades_best',
-            'trades_worst',
-            'trades_per_day',
-        ];
-
-        $list_flat = implode(',', $list);
+        $db = new PDO('sqlite:' .  $conf->dirs->results . $db) or die('Error: Could not open database ' . $db);
 
         $query = "
-            SELECT
-            *
-            FROM RESULTS
+            SELECT * FROM results
             ORDER BY $setup->order DESC
             LIMIT $setup->limit
         ";
 
         $totalRuns = "
-            SELECT count(success) as total FROM runs
+            SELECT count(id) as total FROM runs
         ";
 
         $db->beginTransaction();
 
-            $res = $db->prepare($query);
-            $res->execute();
+            $res = $db->query($query);
             $res = $res->fetchAll(PDO::FETCH_ASSOC);
 
             # total runs for entire exchange/pair
-            $total = $db->prepare($totalRuns);
-            $total->execute();
+            $total = $db->query($totalRuns);
             $total_runs = $total->fetchAll()[0]['total'];
 
         $db->commit();
 
         # single values
         $first = (object) $res[0];
-
         $market_profit = number_format($first->market_profit);
         $strategy_profit = number_format($first->strategy_profit);
-        $strat_params = json_decode(gzdecode($first->strat_params), true);
-
-        // parse strat_params
-        $str = '';
-        foreach( $strat_params as $k => $p ){
-            $str .= "# $k\n";
-            foreach($p as $kk => $v){
-                $str .= "$kk = $v\n";
-            }
-        }
-
-
-        $strat_str = $str;
 
         $str = "
             <section id='cards'>
@@ -270,13 +228,7 @@
                                     Best trade: $first->trades_best% / Worst trade: $first->trades_worst%<br>
                                     Candle size: {$first->candle_size} min / Trades/day: $first->trades_per_day
                                 </p>
-                                <button class='show_popover'>View strat settings</button>
-                                <div class='popover hidden'>
-                                    <i class='close' onclick='this.parentNode.classList.toggle(\"hidden\")'>&times;</i>
-                                    <h3>Strategy params</h3>
-                                    <p>For best performing params</p>
-                                    <textarea onfocus='this.select()'>$strat_str</textarea>
-                                </div>
+                                <a class='button' href='views/view.more.php?id={$first->id}&db=$db_name' target='_blank'>Open run</a>
                             </div>
                         </div>
                     </column>
@@ -303,7 +255,7 @@
 
         # pre-process
         $cols = [
-            'id',
+			'id',
             'candle_size',
             'strategy_profit',
             'sharpe',
@@ -314,7 +266,6 @@
         ];
 
         $tbl = [];
-        $noTable = ['strat_params','report','roundtrips'];
         foreach($res as $key => $arr){
             foreach($arr as $k => $v ){
                 if( in_array($k, $cols) ){
@@ -343,9 +294,10 @@
             $id = $tbl[$k]['id'];
             $dbname = _G('db');
             $str = "
-                <button class='show_popover button-outline' rel='view.more.php?id=$id&db=$dbname'>Open</button>
+                <a class='button button-outline' href='views/view.more.php?id=$id&db=$dbname' target='_blank'>Open</a>
             ";
             $tbl[$k]['&nbsp;'] = $str;
+			unset($tbl[$k]['id']); // remove id
         }
 
         $tbl = sqlTable($tbl, 'sortable colored striped', false, 'tbl');
@@ -370,28 +322,22 @@
 ?>
 
 <?php
+
     # exclude columns to calculate on
-    $exclude = "id,trades,trades_win,trades_lose,market_profit,trades_win_avg,trades_lose_avg,trades_best,trades_worst,trades_per_day,sharpe,alpha,strat_params,report,roundtrips";
+    $exclude = "id,market_profit,alpha,strat";
     $exclude = explode(",", $exclude);
 
-    $sql = "
-        SELECT * FROM results
-        ORDER BY $setup->order DESC
-        LIMIT $setup->limit
-    ";
-
-    $res = $db->query($sql);
-    $res = $res->fetchAll(PDO::FETCH_ASSOC);
-
     $new = [];
-    foreach($res as $key => $arr ){
+    foreach( $res as $key => $arr ) // re-use $res array from SQL-query
+	{
         foreach($arr as $k => $v ){
             if( !in_array($k, $exclude) ) $new[$key][$k] = $v;
         }
     }
 
     $avg = [];
-    foreach( $new as $key => $arr ){
+    foreach( $new as $key => $arr )
+	{
         foreach( $arr as $k => $v ){
             @$avg[$k] += $v;
         }
@@ -405,14 +351,14 @@
     }
 
     $avg = $q;
-    #prp($avg);
 ?>
+
 <section>
     <hr>
     <h2>Average strategy</h2>
-    <p>Average meta and strategy parameter settings for top <?= $setup->limit ?> sorted by '<?= $setup->order ?>'</p>
+    <p>Average meta for top <?= $setup->limit ?> sorted by "<?= $setup->order ?>"</p>
 
-    <table class="striped colored">
+    <table class="striped colored mb-double">
     <thead>
         <tr>
             <th>Name</th>
@@ -421,46 +367,102 @@
     </thead>
     <tbody>
     <?php
-        $str = '';
-        $strat = "# Average strategy settings\n";
+		$percent_values = ['trades_win_percent','trades_win_avg','trades_lose_avg','trades_best','trades_worst','strategy_profit'];
+		$str = '';
+
         foreach( $avg as $k => $v )
         {
             $old = $k;
-            if( $k == 'strategy_profit' ){ $k = 'Strategy profit'; $v = $v . '%'; }
-            if( $k == 'candle_size' ){ $k = 'Candle size'; $v = $v . ' min'; }
-            if( contains('trades_', $k) ){ $k = str_replace('trades_', '', $k); }
-            if( $k == 'win_percent' ) { $k = 'Win percent'; $v = $v . '%'; }
+            if( $k == 'candle_size' ){ $v = $v . ' min'; }
+
+			// nicer large numbers
+			if( is_numeric($v) && $v > 999 ) $v = (float) number_format($v, 3);
+
+			// add %
+			if( in_array($k, $percent_values) ) $v = $v . '%';
+
+			// fix trades_
+			if( contains('trades_', $k) ){ $k = str_replace('trades_', 'Trades &rarr; ', $k); }
+
+			// fix format
+			$k = str_replace(['_','avg','percent'], [' ', 'average','%'], $k);
+			$k = ucwords($k);
+
             $str .= "
                 <tr>
                     <td>$k</td>
                     <td>$v</td>
                 </tr>
             ";
-
-            if( $old == 'candle_size' || $old == 'strategy_profit' || $old == 'trades_win_percent' ){}
-            else {
-                $strat .= "$k = $v\n";
-            }
         }
         echo $str;
+
+
+		/* generate average strategy settings */
+
+		# get selected strategy
+		$arr = explode('__', $db_name);
+		$strat_name = $arr[4];
+		$strat_name = str_replace('.db', '', $strat_name);
+
+		# add strategy params to array
+		$strat_values = [];
+		foreach($res as $k => $v ){
+			$strat = json_decode(gzdecode($v['strat']), true);
+			$strat = $strat[$strat_name];
+			$strat_values[] = $strat;
+		}
+
+		# get average from all the strat_params values
+		$avg = $gab->strategy_average($strat_values);
+
+		# create a new TOML-file out of it
+		$avg_toml = $gab->create_toml($avg); // returns string
+
     ?>
-</tbody>
+	</tbody>
     </table>
 
     <h4>Generated settings</h4>
-    <p>From the averages above, excluding candle size etc</p>
-    <form>
-    <?php
-        echo "<textarea class='strat_avg' id='strat_avg' onfocus='this.select()'>$strat</textarea>";
-    ?>
+    <p>For the strategy and the top <?php echo $setup->limit ?> runs</p>
+    <form id="generate">
+
+	    <?php
+	        echo "<textarea class='strat_avg mb monospace' id='strat_avg' onfocus='this.select()'>$avg_toml</textarea>";
+	    ?>
+		<h6>Strategy test generator</h6>
+		<p>Generate +/- settings from average strategy parameters above</p>
+
+		<div id="gen">
+			<row>
+				<column>
+					<label><b>1000's</b>&nbsp; +/&minus; and stepping</label>
+					<input type="number" value="200" max="1000">
+					<input type="number" value="100" max="500">
+				</column>
+				<column>
+					<label><b>100's</b>&nbsp; +/&minus; and stepping</label>
+					<input type="number" value="100" max="">
+					<input type="number" value="50" max="">
+				</column>
+				<column>
+					<label><b>10's</b>&nbsp; +/&minus; and stepping</label>
+					<input type="number" value="10" max="">
+					<input type="number" value="5" max="">
+				</column>
+				<column>
+					<label><b>1's</b>&nbsp; +/&minus; and stepping</label>
+					<input type="number" value="5" max="">
+					<input type="number" value="5" max="">
+				</column>
+			</row>
+		</div>
+
+		<input type="submit" class="button mt mb" value="Generate">
+		<div id="generated"></div>
     </form>
 
 </section>
-
-
-
-
-
 
 <?php
     // end if _G('db') set
@@ -469,147 +471,217 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<script src="assets/jquery-3.3.1.min.js"></script>
-<script src="assets/scripts.js"></script>
-
 <script>
-/* sortable table */
-(function(){var g=/\bsortable\b/;document.addEventListener("click",function(d){var c=d.target;if("TH"==c.nodeName){var a=c.parentNode;d=a.parentNode.parentNode;if(g.test(d.className)){var e,b=a.cells;for(a=0;a<b.length;a++)b[a]===c?e=a:b[a].className=b[a].className.replace(" dir-down","").replace(" dir-up","");b=c.className;a=" dir-down";-1==b.indexOf(" dir-down")?b=b.replace(" dir-up","")+" dir-down":(a=" dir-up",b=b.replace(" dir-down","")+" dir-up");c.className=b;c=d.tBodies[0];b=[].slice.call(c.cloneNode(!0).rows,
-0);var h=" dir-up"==a;b.sort(function(a,b){a=a.cells[e].innerText;b=b.cells[e].innerText;if(h){var c=a;a=b;b=c}return isNaN(a-b)?a.localeCompare(b):a-b});var f=c.cloneNode();for(a=0;a<b.length;a++)f.appendChild(b[a]);d.replaceChild(f,c)}}})})();
+	window.onload = function(){
+		let gen = $('#generate');
+
+		gen.on('submit', function(e){
+			e.preventDefault();
+
+			let inputs = $('#gen').find('input');
+			let arr = [];
+
+			inputs.each(function(i){
+				arr[i] = $(this).val();
+			})
+
+			let str = plusMinusStrategy( $('#strat_avg')[0].value, arr );
+
+			// calc possibilities
+			let possible = calcPossibilities( str );
+
+			// html
+			let html = "<h6>Possibilities</h6><p>" + possible + " different possibilities</p>";
+			html += "<h6>Generated dynamic settings</h6><p>You might want to check it first and make some adjustments..</p><textarea id='gen_dyn' class='monospace'>"+ str +"</textarea>";
+			$('#generated').html(html);
+			gab.autoSizeTextarea($('#gen_dyn')[0]);
+
+		})
+	}
+
+
+	function plusMinusStrategy( str, arr )
+	{
+		str = str || false;
+		if( !str ) { alert('Error for plusMinusStrategy() function'); return false; }
+
+		let pm1000 = +arr[0],
+			s1000 = +arr[1],
+			pm100 = +arr[2],
+			s100 = +arr[3],
+			pm10 = +arr[4],
+			s10 = +arr[5],
+			pm1 = +arr[6],
+			s1 = +arr[7];
+
+		let originalLines = str.split('\n');
+		let lines = originalLines;
+
+		// split to values
+		let i = 0,
+			len = lines.length,
+			cur, val, key, split, val_len, min, max, step, isMinus;
+
+		let calc_arr = [];
+		for(i; i < len; i++){
+			cur = lines[i];
+
+			if( cur.indexOf('=') > -1 )
+			{
+				split = cur.split('= '); // get second (the value)
+				key = split[0]
+				val = Math.floor(split[1]);
+				val_len = val.toString().length;
+				isMinus = false;
+
+				//console.log(val);
+
+				if( val < 0 ) isMinus = true;
+				if( isMinus ) val_len = val.toString().replace('-','').length;
+
+				switch( val_len ){
+					case 4:
+						val = Math.floor(val / 500) * 500; // round to nearest 500
+						min = val - pm1000;
+						max = val + pm1000;
+						step = s1000;
+						break;
+					case 3:
+						val = Math.floor(val/50) * 50; // round.. ~50
+						min = val - pm100;
+						max = val + pm100;
+						step = s100;
+						break;
+					case 2:
+						val = Math.floor(val/5) * 5; // round.. ~5
+						min = val-pm10;
+						max = val+pm10;
+						step = s10;
+						if( min == 0 ) min = 5;
+						if( isMinus && max == 0 ){
+							max = min + 20;
+							if( max == 0 ) max = -5;
+						}
+						break;
+					case 1:
+						val = Math.floor(val/5) * 5; // round.. 5
+						if( val == 0 ) val = 1;
+						min = val - pm1;
+						max = val + pm1;
+						step = s1;
+						if( min == 0 ) min = 1;
+				}
+
+				// concatinate
+				val = min + ':' + max + ',' + step;
+
+				// set at line and add key back
+				lines[i] = key + "= " + val;
+
+			} // if cur.indexOf()
+
+		} // for()
+
+		// create string
+		i = 0;
+		let out = '';
+		for( i; i < len; i++ )
+		{
+			out += lines[i] + "\n";
+		}
+
+		return out;
+
+	} // plusMinusStrategy()
+
+	function range(start, end, step)
+	{
+
+		var range = [];
+		var typeofStart = typeof start;
+		var typeofEnd = typeof end;
+
+		if (step === 0) {
+			throw TypeError("Step cannot be zero.");
+		}
+
+		if (typeofStart == "undefined" || typeofEnd == "undefined") {
+			throw TypeError("Must pass start and end arguments.");
+		}
+		else if (typeofStart != typeofEnd) {
+			throw TypeError("Start and end arguments must be of same type.");
+		}
+
+		typeof step == "undefined" && (step = 1);
+
+		if (end < start) {
+		step = -step;
+		}
+
+		if (typeofStart == "number") {
+
+		while (step > 0 ? end >= start : end <= start) {
+		range.push(start);
+		start += step;
+		}
+
+		} else if (typeofStart == "string") {
+
+		if (start.length != 1 || end.length != 1) {
+			throw TypeError("Only strings with one character are supported.");
+		}
+
+		start = start.charCodeAt(0);
+		end = end.charCodeAt(0);
+
+		while (step > 0 ? end >= start : end <= start) {
+			range.push(String.fromCharCode(start));
+			start += step;
+		}
+
+		}
+		else {
+			throw TypeError("Only string and number types are supported");
+		}
+
+		return range;
+
+	}
+
+	// calcPossibilities, requires TOML file with dynamic parameters
+	function calcPossibilities( toml )
+	{
+		let lines = toml.split("\n"),
+			i = 0, len = lines.length,
+			cur, split, val,
+			countArr = [],
+			possibilities = 1;
+
+		for( i; i < len; i++ )
+		{
+			cur = lines[i];
+			if( cur.indexOf('=') > -1 )
+			{
+				split = cur.split('= ');
+				val = split[1];
+				val = val.replace(',',':');
+				val = val.split(':');
+				countArr[i] = range(+val[0],+val[1],+val[2]).length;
+			} // cur.indexOf()
+		}
+		i = 0, len = countArr.length;
+		for( i; i < len; i++ ){
+			cur = countArr[i];
+			if( !isNaN(cur) ){
+				possibilities = possibilities * cur;
+			}
+		}
+
+		possibilities = possibilities.toLocaleString('en-GB');
+		return possibilities;
+	}
 </script>
 
-<script>
-/* table stuff */
-function tr_check(el){
-
-    let input = el.find('input');
-    input.prop('checked', 'checked');
-    input.focus();
-    input.trigger('select');
-    el.parent().find('.checked').removeClass('checked');
-    el.addClass('checked');
-
-}
-
-var results = $('#results');
-results.on('click', 'tr', function(){
-    tr_check($(this));
-})
-
-
-/* clean / remove table */
-results.on('click', 'a', function(e){
-    e.preventDefault(); e.stopPropagation();
-
-    let t = $(this),
-        tr = t.parents('tr'),
-        rel = tr.attr('rel'), // db filename
-        prevText = t.text();
-
-    t.text('WAIT..')
-    .addClass('button-secondary')
-    .removeClass('button-outline');
-
-    if( t.is('.remove') ){
-        //alert('remove');
-        var c = confirm('Sure? This will remove all data.');
-
-        if( c ){
-            ajax.get('system/remove_db.php?id=' + rel, 'DB removed', function(data){
-                console.log(data);
-                tr.next('tr').trigger('click'); // select next in line since this will get removed
-                tr.remove();
-                t.text(prevText)
-                .removeClass('button-secondary')
-                .addClass('button-outline'); // reset
-            });
-        }
-        else {
-            t.text(prevText)
-            .removeClass('button-secondary')
-            .addClass('button-outline'); // reset
-        }
-    }
-
-    // not remove..
-    else {
-        ajax.get('system/clean_db.php?id=' + rel, 'DB was cleaned', function(data){
-            t.parent().parent().find('i').text(data);
-            t.text(prevText)
-            .removeClass('button-secondary')
-            .addClass('button-outline'); // reset
-        });
-    }
-
-})
-
-/* auto resize textarea */
-function autoSizeTextarea( self ){
-    self.setAttribute('style','height: 0px; transition:none'); // reset
-    self.style.height = (self.scrollHeight) + 'px';
-    self.setAttribute('style', 'height:' + (self.scrollHeight + 30) + 'px');
-}
-
-/* show strat params */
-$('#cards').on('click', '.show_popover', function(){
-    var t = $(this),
-        next = t.next('.popover');
-
-    next.toggleClass('hidden');
-    autoSizeTextarea(next.find('textarea')[0]);
-})
-
-
-/* filter table */
-function filterTable( self, trs ){
-    let val = self.value.toLowerCase();
-    trs.each(function(){
-        this.innerText.toLowerCase().indexOf(val) > -1 ? this.classList.remove('hidden') : this.classList.add('hidden');
-    })
-}
-
-var trs = $('#results').find('tbody tr');
-$('#filter').on('keyup', function(){
-    filterTable(this, trs);
-})
-
-/* table open */
-var tbl = $('#tbl');
-tbl.on('click', 'button', function(){
-
-    let rel = './' + this.getAttribute('rel');
-    var hasPop = $('#popover');
-    var popStr = "<div id='popover' class='popover more-data hidden'><i class='close' onclick='this.parentNode.classList.toggle(\"hidden\")'>&times;</i><div class='inner'>Loading...</div></div>";
-    if( !hasPop.length ) {
-        $(document.querySelector('body')).append(popStr); hasPop = $('#popover');
-    }
-
-    hasPop.find('div').text('Loading...');
-    hasPop.toggleClass('hidden');
-
-    ajax.get(rel, false, function(data){
-        hasPop.find('div').html(data);
-    });
-})
-
-/* autosize strategy average params */
-let strat_avg = document.getElementById('strat_avg');
-if(strat_avg) autoSizeTextarea(strat_avg);
-</script>
-</body>
-</html>
+<?php
+	require $conf->dirs->views . 'footer.php';
+?>

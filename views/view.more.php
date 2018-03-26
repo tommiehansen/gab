@@ -1,50 +1,30 @@
 <?php
 
-    /* set large defaults for PHP */
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-    ini_set('max_execution_time', 3600000);
-    ini_set('memory_limit','512M');
-    set_time_limit(0);
-
-
-    require_once 'system/conf.php';
-    require_once 'system/functions.php';
+    require_once '../system/conf.php';
+    require_once $conf->dirs->system . 'functions.php';
+    require_once $conf->dirs->system . 'class.gab.php';
 
     # checks
     _G('db') ? $db = _G('db') : $db = false;
     _G('id') ? $id = _G('id') : $id = false;
-    _G('windowed') ? $windowed = _G('windowed') : $windowed = false;
     if(!$db || !$id) die('E');
 
-    $page = 'view';
+    $page = 'view.more';
+    $page_title = 'View more';
+
+    require 'header.php';
+
+    $gab = new GAB\core($conf);
 ?>
 
-<?php if($windowed): ?>
-    <!doctype html>
-    <html lang="en-us">
-    <head>
-    	<title>GAB - Gekko Automated Backtests</title>
-    	<meta charset="utf-8">
-    	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1">
-    	<link href="assets/css/styles.css" rel="stylesheet">
-    </head>
-    <body class="medium">
-    <?php include 'system/nav.php' ?>
-    <section>
-<?php endif; ?>
 
+<section>
 <h3>Run id <?= $id ?></h3>
-<?php if($windowed): ?>
 <p><?= $db ?></p>
-<?php endif; ?>
+
 <a href="#more_data" class="button">Data</a>
 <a href="#more_strategy" class="button">Strategy params</a>
 <a href="#more_roundtrips" class="button">Roundtrips</a>
-
-<?php if(!$windowed): ?>
-<a class="button button-outline" href="view.more.php?db=<?= $db ?>&id=<?= $id ?>&windowed=true" target="_blank">Open in new window</a>
-<?php endif; ?>
 
 <?php
 
@@ -52,14 +32,15 @@
     $db = new PDO('sqlite:' .  $conf->dirs->results . $db) or die('Error @ db');
 
     $sql = "
-        SELECT * FROM results
-        WHERE id = '$id'
+        SELECT * FROM results a
+        JOIN blobs b ON a.id = b.id
+        WHERE a.id = '$id'
     ";
 
     $res = $db->query($sql);
     $res = $res->fetchAll(PDO::FETCH_ASSOC)[0];
 
-    $blobs = ['roundtrips', 'strat_params', 'report'];
+    $blobs = ['roundtrips', 'report'];
     $normal = 'candle_size,strategy_profit,market_profit,sharpe,alpha,trades,trades_win,trades_lose,trades_win_percent,trades_win_avg,trades_lose_avg,trades_best,trades_worst,trades_per_day';
     $normal = explode(',', $normal);
 
@@ -190,18 +171,12 @@
 
 
     /* get strategy */
-    $strat = json_decode(gzdecode($new_blobs['strat_params']), true);
-
-    $str = '';
-    foreach( $strat as $name => $arr ){
-        $str .= "# $name\n";
-        foreach($arr as $k => $v ){
-            $str .= "$k = $v\n";
-        }
-    }
+    $strat = json_decode(gzdecode($res['strat']), true);
+    $strat = array_values($strat);
+    $str = $gab->create_toml($strat[0]);
 
     echo "<hr><h4 id='more_strategy'>Strategy params</h4><p>All the parameters stored</p>";
-    echo "<form><textarea onload='autoSizeTextarea(this)' onfocus='this.select();' onclick='autoSizeTextarea(this)' style='min-height:320px'>$str</textarea></form>";
+    echo "<form><textarea onfocus='this.select();' onclick='gab.autoSizeTextarea(this)' style='min-height:320px'>$str</textarea></form>";
 
     echo "
         <hr>
@@ -257,19 +232,9 @@
 ?>
 
 
-<?php if($windowed): ?>
 </section>
 
 
-<script>
-/* auto resize textarea */
-function autoSizeTextarea( self ){
-    self.setAttribute('style','height: 0px; transition:none'); // reset
-    self.style.height = (self.scrollHeight) + 'px';
-    self.setAttribute('style', 'height:' + (self.scrollHeight + 30) + 'px');
-}
-</script>
-</body>
-</html>
-
-<?php endif; ?>
+<?php
+    require 'footer.php';
+?>
