@@ -63,15 +63,16 @@
 
             // generate entire range
             if( $min > 0 ){
-                $range = range(0, $max, $step);
+                // range + error check
+                if( !$range = @range(0, $max, $step) ){
+                    die('<u class="info">ERROR</u> Step exceeds the specified range for <u class="bad">Candle size</u>, fix your strategy settings!');
+                }
             }
             else {
-                $range = range($min, $max, $step);
-            }
-
-            // ..then remove all under $min
-            foreach( $range as $key => $val ){
-                if($val < $min ) unset($range[$key]);
+                // range + error check
+                if( !$range = @range($min, $max, $step) ){
+                    die('<u class="info">ERROR</u> Step exceeds the specified range for <u class="bad">Candle size</u>, fix your strategy settings!');
+                }
             }
 
             // ...and add back $min
@@ -109,7 +110,10 @@
         $max = $vals[1];
         $step = $vals[2];
 
-        $range = range($min, $max, $step);
+        // error-check the range (or die)
+        if( !$range = @range($min, $max, $step) ){
+            die('<u class="info">ERROR</u> Step exceeds the specified range for <u class="bad">Candle size</u>, fix your strategy settings!');
+        }
 
         // ..then remove all under $min
         foreach( $range as $key => $val ){
