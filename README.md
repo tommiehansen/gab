@@ -52,3 +52,9 @@ BEAR_RSI_low = 10:30,5
 The format is <FROM>:<TO>,<STEPPING>.
 This means that e.g. `10:20,5` will generate the range: `10,15,20`
 The params are inclusive meaning that odd stepping e.g. `5:15,10` will become `5,10,15` - the first and last of range is always kept.
+
+
+#### Donate or coffee?
+People keeps asking about this so i'll just leave it here for future reference:
+BTC: 15cZUi7VvmCQJLbPXYYWChHF3JpsBaYDtH
+ETH: 0xe03c5eb9DF93360e3Bcfcd13012B7DeebbED6923
