@@ -204,6 +204,24 @@
 
         $db->commit();
 
+		$hasResults = true;
+		if( !isset($res[0]) )
+		{
+			$hasResults = false;
+			echo "
+				<section>
+					<hr>
+					<h2>No results could be found</h2>
+				</section>
+			";
+		}
+
+?>
+
+<?php if( $hasResults ) { ?>
+
+		<?php
+
         # single values
         $first = (object) $res[0];
         $market_profit = number_format($first->market_profit);
@@ -318,7 +336,11 @@
 ?>
 
 <?php
-    if(_G('db')):
+	} // end $hasResults
+?>
+
+<?php
+    if( _G('db') && $hasResults ):
 ?>
 
 <?php
@@ -472,6 +494,7 @@
 
 
 <script>
+	/* TEMP: CLEAN + MOVE ALL THIS */
 	window.onload = function(){
 		let gen = $('#generate');
 
