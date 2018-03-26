@@ -8,8 +8,6 @@
 */
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-ini_set('memory_limit','512M');
-set_time_limit(3600); // 60 minutes
 
 require_once 'conf.php';
 require_once $conf->dirs->system . 'functions.php';

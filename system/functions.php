@@ -272,7 +272,7 @@
 	{
 
 		$curl = curl_init($url);
-		curl_setopt($curl, CURLOPT_TIMEOUT, 900); // NOTE: 15 minutes (rbb adx take 2-3 mins)
+		curl_setopt($curl, CURLOPT_TIMEOUT, 1800); // NOTE: 15 minutes (rbb adx take 2-3 mins)
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
 		curl_setopt($curl, CURLOPT_POST, true);
