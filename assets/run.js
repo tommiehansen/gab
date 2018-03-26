@@ -68,8 +68,9 @@ strategies.on('click', '#strat_restore', function(e){
     let el = strategies.find(':selected')[0].value;
     if( el.indexOf('.') > -1 ){ el = el.replace(".","_"); } // fix strategies with . (dot)
     let textarea = document.getElementById('toml');
-    textarea.value = strategies[0].querySelector('.' + el + '_default').value;
+    textarea.value = strategies[0].querySelector('.' + el + '_default').innerText;
     gab.autoSizeTextarea(textarea);
+    selectForm.sayt({'savenow': true});
 })
 
 setTimeout(function(){

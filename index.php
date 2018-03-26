@@ -201,11 +201,11 @@
 			foreach( $strategies as $name => $params ) {
 				if( contains('.', $name ) ) $name = str_replace('.','_', $name);
 				echo "<textarea name='_{$name}' class='$name hidden'>$params</textarea>";
-				echo "<textarea name='default_{$name}' class='{$name}_default hidden'>$params</textarea>";
+				echo "<pre class='{$name}_default hidden'>$params</pre>";
 			}
 		?>
 
-		<a href="#" id="strat_restore" class="button button-outline small mt tip" data-tip="Restore above strategy to its original settings. Helpful if the TOML-file has changed or if you just want to clear.">Restore this</a>
+		<a href="#" id="strat_restore" class="button button-outline small mt tip" data-tip="Restore above strategy to its original settings. Helpful if the TOML-file has changed or if you just want to clear.">Restore</a>
 
 	</section>
 
