@@ -1,9 +1,24 @@
 <?php
+	/* USER SETTINGS --------------------------------------- */
 
-	/* core */
+	// your server
 	$server = 'http://localhost:3000/api/';
 
+	/*
+		NOTE: The trailing / after /api/
+		If you change server you will need to
+		'clear cache' before running to get new
+		datasets and strategies for that specific
+		server.
+	*/
+
+	/* ----------------------------------------------------- */
+
+
+
+
 	/* general conf */
+
 	# cache
 	$conf['cache'] = [
 		'cache_dir' => 'cache/',
@@ -19,21 +34,21 @@
 		'datasets' => $server . 'scansets', // get all datasets and meta (eg. from <> to dates)
 		'kill' => $server . 'killGekko', // kill Gekko (POST)
 		'start' => $server . 'startGekko', // start Gekko (POST)
-		'script_files' => __DIR__,
 	];
 
 
 
-	/* dirs */
+	/* url's and paths */
+
+	// web urls
 	$domain = $_SERVER['HTTP_HOST'];
-	$docRoot = $_SERVER['DOCUMENT_ROOT'];
-	$dirRoot = dirname(__FILE__);
 	$protocol = isset($_SERVER["HTTPS"]) ? 'https://' : 'http://';
 	$base_url = $protocol . $domain . substr(__DIR__, strlen($_SERVER[ 'DOCUMENT_ROOT' ])) . '/';
 	$base_url = str_replace('system/', '', $base_url);
 
-	$base_path = $docRoot . "/gab/";
-
+	// server paths
+	$dirRoot = dirname(__FILE__);
+	$base_path = str_replace('/system', '/',$dirRoot);
 
 	# system dirs
 	$conf['dirs'] = [
@@ -52,7 +67,8 @@
 		'assets' => $base_url . 'assets/',
 	];
 
-	# db fields
+	/* database fields */
+
 	$conf['db_fields'] = [
 
 		'blobs' => [
@@ -85,10 +101,8 @@
 	$conf = json_decode(json_encode($conf));
 
 
-
-
 	/* set large defaults for PHP */
 	error_reporting(E_ALL);
 	ini_set('display_errors', 1);
 	ini_set('memory_limit','512M');
-	set_time_limit(900);
+	set_time_limit(1800); // 30 minutes
