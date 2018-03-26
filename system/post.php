@@ -94,6 +94,7 @@
         }
     }
 
+    # use to debug strat params
     #prp( $new ); exit;
 
     # candle size

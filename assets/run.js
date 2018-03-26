@@ -63,6 +63,15 @@ strategies.on('blur', '#toml', function(){
     }
 });
 
+strategies.on('click', '#strat_restore', function(e){
+    e.preventDefault();
+    let el = strategies.find(':selected')[0].value;
+    if( el.indexOf('.') > -1 ){ el = el.replace(".","_"); } // fix strategies with . (dot)
+    let textarea = document.getElementById('toml');
+    textarea.value = strategies[0].querySelector('.' + el + '_default').value;
+    gab.autoSizeTextarea(textarea);
+})
+
 setTimeout(function(){
     gab.autoSizeTextarea(strategies[0].querySelector('textarea')); // init @ load
 }, 100);
