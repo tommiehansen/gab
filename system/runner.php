@@ -413,3 +413,7 @@ else
 	$calc = number_format($profitMarket - $profitStrategy) . '%';
 	echo "<u class='bad'>Bad!</u> Performed $calc worse then market";
 }
+
+
+$db = null;
+exit;
