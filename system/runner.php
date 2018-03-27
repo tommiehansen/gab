@@ -146,8 +146,6 @@ $db	= new PDO($dir) or die("Error creating database file");
 
 # settings
 $db->exec("PRAGMA synchronous=NORMAL");
-#$db->exec('PRAGMA journal_mode=WAL'); // use Write-Ahead-Logging
-#$db->exec('PRAGMA temp_store=FILE');
 $db->exec('PRAGMA journal_mode=MEMORY'); // use MEMORY
 $db->exec('PRAGMA temp_store=MEMORY');
 $db->exec('PRAGMA auto_vacuum=OFF');
@@ -156,42 +154,42 @@ $db->exec('PRAGMA auto_vacuum=OFF');
 $db->beginTransaction();
 
 
-# create runs table
-$sql = "
-CREATE TABLE IF NOT EXISTS runs (
-	id TEXT PRIMARY KEY UNIQUE,
-	success TEXT
-)";
+	# create runs table
+	$sql = "
+	CREATE TABLE IF NOT EXISTS runs (
+		id TEXT PRIMARY KEY UNIQUE,
+		success TEXT
+	)";
 
-$db->query($sql);
-
-
-# create results table
-$sql = "
-	CREATE TABLE IF NOT EXISTS results (
-";
-
-foreach( $results_fields as $key => $val ){ $sql .= "`$key` $val, "; }
-$sql = rtrim($sql, ', '); $sql .= ")";
-$db->query($sql);
-
-# create blobs table
-$sql = "
-	CREATE TABLE IF NOT EXISTS blobs (
-";
-
-foreach( $blobs_fields as $key => $val ){ $sql .= "`$key` $val, "; }
-$sql = rtrim($sql, ', '); $sql .= ")";
-$db->query($sql);
+	$db->query($sql);
 
 
+	# create results table
+	$sql = "
+		CREATE TABLE IF NOT EXISTS results (
+	";
+
+	foreach( $results_fields as $key => $val ){ $sql .= "`$key` $val, "; }
+	$sql = rtrim($sql, ', '); $sql .= ")";
+	$db->query($sql);
+
+	# create blobs table
+	$sql = "
+		CREATE TABLE IF NOT EXISTS blobs (
+	";
+
+	foreach( $blobs_fields as $key => $val ){ $sql .= "`$key` $val, "; }
+	$sql = rtrim($sql, ', '); $sql .= ")";
+	$db->query($sql);
 
 
-/* check if run already exist */
 
-# check if id already exist
-$q = $db->query("SELECT id FROM runs WHERE id = '$run_id'");
-$runs = $q->fetchAll();
+
+	/* check if run already exist */
+
+	# check if id already exist
+	$q = $db->query("SELECT id FROM runs WHERE id = '$run_id'");
+	$runs = $q->fetchAll();
 
 # commit above
 $db->commit();
@@ -247,8 +245,6 @@ if( $profitStrategy > $profitMarket && $profitStrategy !== 0 )
 
 	# results
 	$sql = "INSERT INTO results (";
-
-	# prepare
 	foreach( $results_fields as $key => $val ){ $sql .= "`$key`,"; }
 	$sql = rtrim($sql, ',');
 	$sql .= ") VALUES (";
@@ -263,10 +259,10 @@ if( $profitStrategy > $profitMarket && $profitStrategy !== 0 )
 	$relativeProfit = round($r->relativeProfit);
 	$marketProfit = round($r->market);
 	$sharpe = number_format($r->sharpe, 2);
-	$numTrades = number_format($r->trades);
+	$numTrades = $r->trades; // note, 1x roundtrip = 1x buy + 1x sell
+	$numRoundtrips = count($get->roundtrips);
 	$alpha = number_format($r->alpha);
 	$exchange = $settings['exchange'];
-
 
 	/* loop and add trading data from roundtrips */
 	$roundtrips = $get->roundtrips;
@@ -286,38 +282,70 @@ if( $profitStrategy > $profitMarket && $profitStrategy !== 0 )
 	{
 		$profit = $r->profit;
 		if( $profit < 0 ){
-			$trades['lose']++;
+			$trades['lose'] = $trades['lose'] + 2; // NOTE: 1x roundtrip = 1 buy + 1 sell
 			$trades['lose_avg'][] = $r->profit; // add to array for later calc
 		}
 		else {
-			$trades['win']++;
+			$trades['win'] = $trades['win'] + 2; // NOTE: 1x roundtrip = 1 buy + 1 sell
 			$trades['win_avg'][] = $r->profit;
 		}
 	}
 
-	// best and worst trade
-	$trades['best'] = number_format(max($trades['win_avg']), 2); // re-use win_avg array
-	$trades['worst'] = number_format(min($trades['lose_avg']), 2);
+	// DEBUG
+	if( !$trades['worst'] = @min($trades['lose_avg']) ){
+		#prp($c); // output conf
+	}
 
-	// calc win-percent (how many of the trades were wins?)
-	$win_percent = ( count($trades['win_avg']) / $report->trades ) * 100;
-	$trades['win_percent'] = number_format($win_percent, 2);
+	// check there were wins
+	if( !empty($trades['win_avg']) )
+	{
+		$numWinningTrades = count($trades['win_avg']);
 
-	// calc averages for win and losing trades
-	$count = count($trades['win_avg']);
-	$total = 0;
-	foreach( $trades['win_avg'] as $num ){ $total += $num; }
-	$trades['win_avg'] = number_format($total/$count, 2);
+		$trades['best'] = number_format(max($trades['win_avg']), 2); // re-use win_avg array
 
-	$count = count($trades['lose_avg']);
-	$total = 0;
-	foreach( $trades['lose_avg'] as $num ){ $total += $num; }
-	$trades['lose_avg'] = number_format($total/$count, 2);
+		// calc win-percent (how many of the trades were wins?)
+		$win_percent = ( $numWinningTrades / $numRoundtrips ) * 100;
+		$trades['win_percent'] = number_format($win_percent, 2);
+
+		// calc averages winning trades
+		$count = count($trades['win_avg']);
+		$total = 0;
+		foreach( $trades['win_avg'] as $num ){ $total += $num; }
+		$trades['win_avg'] = number_format($total/$count, 2);
+	}
+	else {
+		$trades['best'] = 0;
+		$trades['win_avg'] = 0;
+		$trades['best'] = 0;
+		$trades['win_percent'] = 0;
+	}
+
+	// check if there were losing trades
+	if( !empty($trades['lose_avg']) )
+	{
+		$trades['worst'] = number_format(min($trades['lose_avg']), 2);
+
+		// calc averages losing trades
+		$count = count($trades['lose_avg']);
+		$total = 0;
+		foreach( $trades['lose_avg'] as $num ){ $total += $num; }
+		$trades['lose_avg'] = number_format($total/$count, 2);
+	}
+	else {
+		$trades['worst'] = 0;
+		$trades['lose_avg'] = 0;
+	}
 
 	// calc average trades per day
-	$dateDiff = date_between($report->startTime, $report->endTime);
-	$days = $dateDiff->days;
-	$trades['per_day'] = number_format($report->trades/$days, 2);
+	if( $numTrades > 0 )
+	{
+		$dateDiff = date_between($report->startTime, $report->endTime);
+		$days = $dateDiff->days;
+		$trades['per_day'] = number_format($report->trades/$days, 2);
+	}
+	else {
+		$trades['per_day'] = 0;
+ 	}
 
 
 	/* set array with all data to be written */
