@@ -4,12 +4,19 @@
 	// your server
 	$server = 'http://localhost:3000/api/';
 
+	// timeout
+	define('SERVER_TIMEOUT', 600); // seconds, 600 = 10 minutes
+
 	/*
-		NOTE: The trailing / after /api/
+		NOTE: The trailing for $server / after /api/
 		If you change server you will need to
 		'clear cache' before running to get new
 		datasets and strategies for that specific
 		server.
+
+		NOTE: Server timeout is used by everything
+		inside the system like cURL timeout, script
+		max execution time etc.
 	*/
 
 	/* ----------------------------------------------------- */

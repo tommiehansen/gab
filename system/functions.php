@@ -101,13 +101,18 @@
 
 
 	# curl get
-	function curl_get($url){
+	function curl_get($url)
+	{
+
+		defined(SERVER_TIMEOUT) ? $timeout = SERVER_TIMEOUT : $timeout = 600;
 
 		$curl = curl_init($url);
 		curl_setopt($curl, CURLOPT_ENCODING, 0);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 120);
+		curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
 
 		$result = curl_exec($curl);
 		$status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -194,13 +199,15 @@
 
 			if( $isExternal ){
 
+				defined(SERVER_TIMEOUT) ? $timeout = SERVER_TIMEOUT : $timeout = 600;
+
 		        $curl = curl_init($src);
 				curl_setopt($curl, CURLOPT_ENCODING, 1);
 				curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 				curl_setopt($curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
 				curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-				curl_setopt($curl, CURLOPT_TIMEOUT, 1800); // NOTE: 30 minutes timeout, timeout in seconds, 1800 = 1 hour
-				curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 1800);
+				curl_setopt($curl, CURLOPT_TIMEOUT, 120);
+				curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $timeout);
 				curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept-Encoding: gzip,deflate')); // important -- reduce doc by 90%
 
 				$data = curl_exec($curl);
@@ -245,9 +252,11 @@
 
 	function curl_post($url, $vars)
 	{
+		defined(SERVER_TIMEOUT) ? $timeout = SERVER_TIMEOUT : $timeout = 600;
 
 		$curl = curl_init($url);
-		curl_setopt($curl, CURLOPT_TIMEOUT, 1800); // NOTE: 30 minutes NOTE2: Timeouts should then be used by ajax so user can set more easily
+		curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
+		curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 120);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, TRUE);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",'Accept-Encoding: gzip,deflate'));
@@ -270,9 +279,11 @@
 	// used to posting to 'self'
 	function curl_post2($url, $vars)
 	{
+		defined(SERVER_TIMEOUT) ? $timeout = SERVER_TIMEOUT : $timeout = 600;
 
 		$curl = curl_init($url);
-		curl_setopt($curl, CURLOPT_TIMEOUT, 1800); // NOTE: 15 minutes (rbb adx take 2-3 mins)
+		curl_setopt($curl, CURLOPT_TIMEOUT, $timeout); // NOTE: 15 minutes (rbb adx take 2-3 mins)
+		curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 120);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
 		curl_setopt($curl, CURLOPT_POST, true);
