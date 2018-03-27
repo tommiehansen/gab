@@ -177,9 +177,10 @@
             $post = curl_post2($prefix . $domain . $dir . '/runner.php', $q); // this echo entire <html>...
             #$post = strip_tags($post, '<dv');
             echo $post;
-
+            exit;
         }
         catch(Exception $e){
-            echo '<p>Error in your TOML, Format for range values are min:max,stepping e.g. 20:60,10</p>';
+            echo 'Error in your TOML, Format for range values are min:max,stepping e.g. 20:60,10';
+            exit;
         }
     }
