@@ -47,6 +47,9 @@
 
 	/* url's and paths */
 
+	// make sure server param actually set before doing stuff
+	$server = $_SERVER['HTTP_HOST'];
+
 	// web urls
 	$domain = $_SERVER['HTTP_HOST'];
 	$protocol = isset($_SERVER["HTTPS"]) ? 'https://' : 'http://';
