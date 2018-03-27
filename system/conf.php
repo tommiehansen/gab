@@ -110,11 +110,10 @@
 	// turn to object
 	$conf = json_decode(json_encode($conf));
 
-	echo '<pre>'; print_r($conf); echo '</pre>';
-
+	#echo '<pre>'; print_r($conf); echo '</pre>';
 
 	/* set large defaults for PHP */
 	error_reporting(E_ALL);
 	ini_set('display_errors', 1);
 	ini_set('memory_limit','512M');
-	set_time_limit(3600); // 60 minutes
+	set_time_limit(SERVER_TIMEOUT); // 60 minutes
