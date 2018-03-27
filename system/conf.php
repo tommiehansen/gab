@@ -53,8 +53,8 @@
 	// web urls
 	$domain = $_SERVER['HTTP_HOST'];
 	$protocol = isset($_SERVER["HTTPS"]) ? 'https://' : 'http://';
-	$base_url = $protocol . $domain . substr(__DIR__, strlen($_SERVER[ 'DOCUMENT_ROOT' ])) . '/';
-	$base_url = str_replace('system/', '', $base_url);
+	$base_url = $protocol . $domain . substr(__DIR__, strlen($_SERVER[ 'DOCUMENT_ROOT' ]));
+	$base_url = str_replace('system', '', $base_url);
 
 	// server paths
 	$dirRoot = dirname(__FILE__);
@@ -109,6 +109,8 @@
 
 	// turn to object
 	$conf = json_decode(json_encode($conf));
+
+	echo '<pre>'; print_r($conf); echo '</pre>';
 
 
 	/* set large defaults for PHP */
