@@ -12,6 +12,9 @@
         die('There was no _POST set');
     }
 
+    #print_r($_POST);
+    #exit;
+
     # init
     require_once 'conf.php';
     require_once $conf->dirs->system . 'functions.php';
@@ -32,6 +35,9 @@
     // check if debug mode
     if( $debug === 'true' ){ $debug = true; }
     else { $debug = false; }
+
+    // check if cli mode
+    _P('cli') ? $isCli = true : $isCli = false;
 
     /* LOOP LINES IN TOML */
     $lines = preg_split("/((\r?\n)|(\r\n?))/", $params);
@@ -175,12 +181,14 @@
             $dir = dirname($_SERVER['PHP_SELF']);
 
             $post = curl_post2($prefix . $domain . $dir . '/runner.php', $q); // this echo entire <html>...
-            #$post = strip_tags($post, '<dv');
+            if( $isCli ) $post = strip_tags($post);
             echo $post;
             exit;
         }
         catch(Exception $e){
             echo 'Error in your TOML, Format for range values are min:max,stepping e.g. 20:60,10';
+            echo "\n";
+            echo $e->getMessage();
             exit;
         }
     }

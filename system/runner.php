@@ -27,8 +27,7 @@ else {
 	die('No strategy was set to be used. Cannot run.');
 }
 
-
-
+#print_r($_POST);
 
 /* 2 - get strategy default params */
 $strat_name = _P('strategy_name');
@@ -47,7 +46,7 @@ foreach($strat_post as $key => $val ){
 }
 
 #prp($strat); exit;
-
+#print_r($settings); exit;
 
 /* 3 - get overall params */
 # NOTE: Gekko doesn't seem to accept date format, needsfix
@@ -98,6 +97,7 @@ $c = [
 # set config (adds rest of configuration items to array)
 $gconf = $gab->set_config($c);
 
+#prp($c); exit;
 #prp($gconf); exit;
 
 
@@ -121,8 +121,6 @@ foreach( $strat[$strat_name] as $key => $value )
 
 #prp($str); exit;
 $run_id = $str;
-
-
 
 
 
