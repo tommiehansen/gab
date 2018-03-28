@@ -56,3 +56,4 @@ sqlite_stuff.txt
 *.txt
 *.txt
 cli/settings.sh
+cli/*.sh
