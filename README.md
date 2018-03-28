@@ -1,7 +1,7 @@
 # **GAB**
 Gekko Automated Backtests
 
-*** **THIS IS ALPHA, ANYTHING BREAKING MIGHT CHANGE AT ANY GIVEN TIME** ***
+*** **THIS IS ALPHA** ***
 
 If something does not work, it simply does not work since time hasn't existed yet to get it working.
 
@@ -56,5 +56,5 @@ The params are inclusive meaning that odd stepping e.g. `5:15,10` will become `5
 
 #### Donate or coffee?
 People keeps asking about this so i'll just leave it here for future reference:
-BTC: 15cZUi7VvmCQJLbPXYYWChHF3JpsBaYDtH
-ETH: 0xe03c5eb9DF93360e3Bcfcd13012B7DeebbED6923
+* BTC: 15cZUi7VvmCQJLbPXYYWChHF3JpsBaYDtH
+* ETH: 0xe03c5eb9DF93360e3Bcfcd13012B7DeebbED6923
