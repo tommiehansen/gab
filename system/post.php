@@ -173,6 +173,7 @@
             $q['dataset'] = $dataset;
             $q['candle_size'] = $candle_size;
             $q['history_size'] = $history_size;
+            if($isCli) $q['cli'] = true;
 
             #prp($q); exit;
 

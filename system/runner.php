@@ -46,17 +46,28 @@ foreach($strat_post as $key => $val ){
 }
 
 #prp($strat); exit;
-#print_r($settings); exit;
+#prp($settings); exit;
+#prph("settings\n\n");
+#prp($settings);
 
 /* 3 - get overall params */
-# NOTE: Gekko doesn't seem to accept date format, needsfix
+# NOTE: Gekko doesn't seem to accept date format ?!, needsfix
 date_default_timezone_set('UTC');
-$jsFrom = date('Y-m-d\TH:i:s\Z', $settings->from);
-$jsTo = date('Y-m-d\TH:i:s\Z', $settings->to);
-$dbFrom = date('Y-m-d', $settings->from);
-$dbTo = date('Y-m-d', $settings->to);
-#$jsFrom = $settings->from;
-#$jsTo = $settings->to;
+
+// cli sends data in Y-m-d 00:00:00 format so need to convert
+if(_P('cli'))
+{
+	$jsFrom = date('Y-m-d\TH:i:s\Z', strtotime($settings->from));
+	$jsTo = date('Y-m-d\TH:i:s\Z', strtotime($settings->to));
+	$dbFrom = date('Y-m-d', strtotime($settings->from));
+	$dbTo = date('Y-m-d', strtotime($settings->to));
+}
+else {
+	$jsFrom = date('Y-m-d\TH:i:s\Z', $settings->from);
+	$jsTo = date('Y-m-d\TH:i:s\Z', $settings->to);
+	$dbFrom = date('Y-m-d', $settings->from);
+	$dbTo = date('Y-m-d', $settings->to);
+}
 
 $settings = [
 	'candle_size' => (int) $candle_size,
@@ -67,8 +78,6 @@ $settings = [
 	'date_from' => $jsFrom, // format: 2017-11-30T22:08:00Z or plain JS date eg 7828749322
 	'date_to' => $jsTo,
 ];
-
-
 
 /* 4 - set all data in config array */
 # NOTE: This is the main Gekko configuration object
@@ -84,8 +93,8 @@ $c = [
 		'candleSize' => $settings['candle_size'], // minutes
 		'historySize' => $settings['history_size'], // minutes
 		'daterange' => [
-			'from' => $settings['date_from'],
-			'to' => $settings['date_to'],
+			'from' => "$jsFrom",
+			'to' => "$jsTo",
 		],
 	],
 
@@ -97,6 +106,7 @@ $c = [
 # set config (adds rest of configuration items to array)
 $gconf = $gab->set_config($c);
 
+#prp($settings);
 #prp($c); exit;
 #prp($gconf); exit;
 

@@ -249,15 +249,12 @@ class core {
 				],
 
 				// not required -- default is to use all data
-				/*
 				'backtest' => [
 					'daterange' => [
-						'from' => '2017-11-30T22:08:00Z',
-						'to' => '2018-01-13T22:58:00Z'
+						'from' => null,
+						'to' => null
 					],
 				],
-				*/
-
 
 				/* stuff that will not change */
 
@@ -316,6 +313,10 @@ class core {
 		$timing = $s['timing'];
 		$gc->tradingAdvisor->candleSize = $timing['candleSize'];
 		$gc->tradingAdvisor->historySize = $timing['historySize'];
+
+		$dates = $timing['daterange'];
+		$gc->backtest->daterange->from = $dates['from'];
+		$gc->backtest->daterange->to = $dates['to'];
 
 		return $c;
 
