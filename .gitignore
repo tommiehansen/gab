@@ -55,5 +55,4 @@ Temporary Items
 sqlite_stuff.txt
 *.txt
 *.txt
-*.sample
 cli/settings.sh
