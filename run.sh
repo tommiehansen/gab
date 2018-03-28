@@ -10,10 +10,10 @@ DIR="/gab/"
 # threads
 THREADS=3 # TODO: FIX ...
 
-# strategy
+# strategy, must be valid. Check your JS-files for names and remove .js extension.
 STRATEGY="RSI_BULL_BEAR"
 
-# TOML for strategy
+# TOML for strategy, just copy-paste the params and add dynamic variables
 TOML="
     SMA_long = 100:1000,100
     SMA_short = 10:50,10
@@ -25,7 +25,7 @@ TOML="
     BEAR_RSI_low = 10:30,5
 "
 
-# settings
+# settings, rest of the settings -- make sure you actually have the dataset
 candle_size="5:15,5"
 exchange="bitfinex"
 currency="USD"
