@@ -31,8 +31,8 @@ exchange="bitfinex"
 currency="USD"
 asset="XRP"
 history_size="10"
-from="0"
-to="0"
+from=""
+to=""
 
 # END USER SETTINGS ----------------------------------------------------
 
