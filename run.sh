@@ -104,10 +104,10 @@ runforever()
 
     # curl
     #curl -X POST --data "$(generate_post_data)" $SRC
-
     get=$(curl -s -X POST --data "$(generate_post_data)" $SRC)
-    #timer_end=$(date +%s)
-    #diff=$(($timer_end - $timer_start))
+    timer_end=$(date +%s)
+    diff=$(($timer_end - $timer_start))
+
     #if [[ diff < 3 ]]; then
     #    let "MAX_COUNTER++"
     #else
