@@ -1,61 +1,27 @@
 #!/bin/bash
 clear
 
-# USER SETTINGS ---------------------------------------------------------
+file=$@
 
-# Server (with php) + dir
-SERVER="http://localhost:8889"
-DIR="/gab/"
+# check if settings.sh exists
+if [ ! -f cli/$file ]; then
+    echo " ERROR!"
+    echo " You have no $file file located in the folder cli, please create it and try again."
+    echo " Tip: Use settings.sample.sh as a template"
+    echo " Note: You must use LF (unix) line endings"
+    return
+fi
 
-# Threads
-THREADS=3 # TODO: FIX ...
+if (( "$#" != 1 ))
+then
+    echo " ERROR - No configuration file supplied"
+    echo " Usage: . run.sh your-settings.sh"
+return
+fi
 
-# Strategy, must be valid
-# Check your JS-files for names and remove .js extension e.g. RSI_BULL_BEAR
-STRATEGY="RSI_BULL_BEAR_ADX"
+# import user settings
+. cli/$file
 
-# TOML for strategy, just copy-paste the params and add dynamic variables
-# NOTE: Avoid odd formatting with thousands of tabs and spaces...
-# NOTE: format is <MIN>:<MAX>,<STEPPING> e.g. 10:20,5 or -20:-5,5
-TOML="
-[SMA]
-long = 700:1000,50
-short = 10:90,5
-
-[BULL]
-rsi = 5:20,5
-high = 70:90,5
-low = 30:50,5
-mod_high = 5:10,5
-mod_low = -30:-15,5
-
-[BEAR]
-rsi = 5:20,5
-high = 20:40,5
-low = 10:30,5
-mod_high = 10:20,5
-mod_low = -20:-5,5
-
-[ADX]
-adx = 1:10,5
-high = 60:80,5
-low = 20:40,5
-"
-
-# settings, rest of the settings -- make sure you actually have the dataset
-candle_size="10:15,5"
-exchange="poloniex"
-currency="USDT"
-asset="ETC"
-history_size="10"
-
-# dates, use Y-m-d format e.g. 2018-12-24 or Y-m-dT23:00:00:00Z e.g. 2018-12-24T23:30:00:00Z if nerding out
-# NOTE: Changing date from/to *WILL* create a new database for that daterange
-# NOTE: You need to check your dataset(s) to get these values
-from="2017-12-01"
-to="2018-02-01"
-
-# END USER SETTINGS ----------------------------------------------------
 
 # urlencode <string>
 urlencode()
