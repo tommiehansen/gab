@@ -70,19 +70,14 @@
                 continue;
             }
 
-            // generate entire range
-            if( $min > 0 ){
-                // range + error check
-                if( !$range = @range(0, $max, $step) ){
-                    die('<u class="info">ERROR</u> Step exceeds the specified range for <u class="bad">Candle size</u>, fix your strategy settings!');
-                }
+            /* generate entire range */
+            // range + error check
+            if( !$range = @range($min, $max, $step) ){
+                die('<u class="info">ERROR</u> Step exceeds the specified range for <u class="bad">Candle size</u>, fix your strategy settings!');
             }
-            else {
-                // range + error check
-                if( !$range = @range($min, $max, $step) ){
-                    die('<u class="info">ERROR</u> Step exceeds the specified range for <u class="bad">Candle size</u>, fix your strategy settings!');
-                }
-            }
+			else {
+				$range = @range($min, $max, $step);
+			}
 
             // ...and add back $min
             $range[0] = $min;
