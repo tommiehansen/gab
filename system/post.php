@@ -71,7 +71,8 @@
             }
 
             /* generate entire range */
-            // range + error check
+
+            // generate + error check
             if( !$range = @range($min, $max, $step) ){
                 die('<u class="info">ERROR</u> Step exceeds the specified range for <u class="bad">Candle size</u>, fix your strategy settings!');
             }
