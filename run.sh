@@ -2,11 +2,12 @@
 clear
 
 file=$@
+set -a
 
 # check if settings.sh exists
-if [ ! -f cli/$file ]; then
+if [ ! -f $file ]; then
     echo " ERROR!"
-    echo " You have no $file file located in the folder cli, please create it and try again."
+    echo " You have no $file file, please create an .sh file in the cli folder and try again."
     echo " Tip: Use settings.sample.sh as a template"
     echo " Note: You must use LF (unix) line endings"
     return
@@ -19,8 +20,25 @@ then
 return
 fi
 
+# check if gnu paralell is installed
+#command -v paralell >/dev/null 2>&1 || { echo "I require gnu paralell but it's not installed.  Try installing via apt-get paralell or similar package manager." >&2; }
+
+
+# ask user for number of threads
+THREADS=1
+#echo -n "How many threads? [1-99]: "
+#read THREADS
+if [[ $THREADS -lt 1 || $THREADS -gt 99 ]]
+    then
+        echo "Bad number of threads, idiot."
+        return
+else
+    clear
+fi
+
+
 # import user settings
-. cli/$file
+. $file
 
 
 # urlencode <string>
@@ -121,14 +139,75 @@ printf "${yel}  $SRC ${end}\n\n"
 printf "${yel}${line}${end}\n"
 
 # display threads
-printf "${cyn}INFO${end} > Running $STRATEGY using 1 thread(s) \n"
-printf "${cyn}INFO${end} > To quit hold CTRL+C \n\n"
-printf "\n\n";
+info="${cyn}INFO${end} >"
+set="${yel}SETTINGS${end} >"
+printf "$info Running $STRATEGY using $THREADS thread(s) \n"
+printf "$info To quit hold CTRL+C \n\n"
+printf "$set \n"
+printf "    $asset / $currency @ $exchange \n"
+printf "    Candle: ${candle_size} min  History: $history_size \n"
+printf "\n";
+
+
+arr[0]=" you bloody idiot."
+arr[1]=" and let's have a nice day?"
+arr[2]=" ... hopefully it will turn out well."
+arr[3]=" you piece of s*** garbabe w***!"
+arr[4]="! Maybe drink some coffee and go watch the sun?"
+arr[5]="! This is a great time to go do other things."
+arr[6]=" and while it runs let's spam Tommie Hansen with random questions."
+
+rand=$(( RANDOM % 7 ))
+
+printf "Let's go${arr[$rand]} \n\n"
 
 # run forever with X threads
 #export -f runforever
-#xargs -P 3 {} bash -c 'runforever'
-#xargs -P 2 'runforever'
+#export -f generate_post_data
+
+#xargs -P 10 -n 10 -I{} bash -c runforever
+#xargs -P $THREADS -n 2 -I{} bash -c echo runforever
+#xargs -n 1 -P 5 -I{} bash -c runforever {}
+#xargs -P 4 -n 1 'runforever'
+
+#xargs -n1 -P3 -i bash -c "-a $(declare -f) ; runforever {}"
+#xargs -n1 -P2 -i bash -c "runforever {}"
+#xargs -n 1 -P 2 -i bash -c $(runforever)
+
+#xargs -n3 -P3 -i bash -c $(runforever)
+#xargs -n5 -P5 -i bash printf $(runforever)
+#xargs -0 -I {} -P 4 $(runforever)
 
 # init
 runforever
+
+# run forever with X threads
+#export -f runforever
+#export -f generate_post_data
+
+#xargs -P 10 -n 10 -I{} bash -c runforever
+#xargs -P $THREADS -n 2 -I{} bash -c echo runforever
+#xargs -n 1 -P 5 -I{} bash -c runforever {}
+#xargs -P 4 -n 1 'runforever'
+
+#xargs -n1 -P3 -i bash -c "-a $(declare -f) ; runforever {}"
+#xargs -n1 -P2 -i bash -c "runforever {}"
+#xargs -n 1 -P 2 -i bash -c $(runforever)
+
+#xargs -n3 -P3 -i bash -c $(runforever)
+#xargs -n5 -P5 -i bash printf $(runforever)
+#xargs -0 -I {} -P 4 $(runforever)
+#Q=5
+#parallel -j $Q ::: runforever
+#parallel -j 10 ::: runforever
+#make -R n -j $Q runforever
+#parallel -P $Q ::: runforever
+
+# WORKS!
+#parallel ::: runforever runforever runforever
+
+# init
+#runforever & printf "\n" &
+#runforever & printf "\n" &
+#runforever
+#wait

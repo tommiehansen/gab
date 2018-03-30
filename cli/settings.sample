@@ -2,9 +2,6 @@
 SERVER="http://localhost:8889"
 DIR="/gab/"
 
-# Threads
-THREADS=3 # TODO: FIX ...
-
 # Strategy, must be valid
 # Check your JS-files for names and remove .js extension e.g. RSI_BULL_BEAR
 STRATEGY="RSI_BULL_BEAR_ADX"
