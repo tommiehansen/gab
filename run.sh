@@ -16,7 +16,7 @@ fi
 if (( "$#" != 1 ))
 then
     echo " ERROR - No configuration file supplied"
-    echo " Usage: . run.sh your-settings.sh"
+    echo " Usage: . run.sh cli/your-settings.sh"
 return
 fi
 
