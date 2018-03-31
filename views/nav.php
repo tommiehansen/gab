@@ -1,18 +1,50 @@
 <?php
+	$nav_pages = [
+		'left' => [
+			'run' => ['Run Strategy', 'index.php'],
+			'view' => ['View runs', 'view.php'],
+		],
+		'right' => [
+			'scratch' => ['Scratchpad', '#'],
+			'about' => ['About','#'],
+		],
+	];
 	if(!$page) $page = 'run';
 ?>
 <div id="nav">
 	<section>
 		<i class="logo">GAB</i>
-		<div class="menu">
-			<a href="index.php" class="<?php if($page == 'run') echo 'on'; ?>">Run strategy</a>
-			<a href="view.php" class="<?php if($page == 'view') echo 'on'; ?>">View runs</a>
-		</div>
-		<div class="menu right">
-			<a href="#" onclick="document.getElementById('scratchpad').classList.toggle('hidden');return false;">Scratchpad</a>
-			<a href="about.php" onclick='alert("No");return false;'>About</a>
-		</div>
+		<?php
+			$left = '<div class="menu">';
+			$right = '<div class="menu right">';
+
+			foreach( $nav_pages as $key => $arr )
+			{
+				foreach( $arr as $k => $sub )
+				{
+					$name = $sub[0];
+					$link = $conf->urls->base . $sub[1];
+					$page == $k  ? $className = 'on' : $className = '';
+
+					$link = "<a href='$link' class='$className'>$name</a>";
+
+					# temp stuff
+					if( $k == 'scratch' ) $link = str_replace('class', 'onclick="document.getElementById(\'scratchpad\').classList.toggle(\'hidden\');return false;" class', $link);
+					else if( $k == 'about') $link = str_replace('class', 'onclick="alert(\'No\');return false;" class', $link);
+
+					# add to left/right
+					$key == 'left' ? $left .= $link : $right .= $link;
+				}
+			} // foreach()
+
+			$left .= '</div>';
+			$right .= '</div>';
+
+			# output
+			echo $left . $right;
+		?>
 	</section>
+	<div id="goup"></div>
 </div>
 
 <div id="scratchpad" class="popover hidden">

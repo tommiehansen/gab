@@ -77,6 +77,7 @@ var gab = {
 	init: function()
 	{
 		this.scratchpad();
+		this.menu_show_hide();
 	},
 
 
@@ -179,6 +180,41 @@ var gab = {
 			par.find('#tr_noresult').remove();
 			par.append('<tr id="tr_noresult"><td colspan='+ cols +'>No match</td></tr>');
 		}
+	},
+
+	// auto-show/hide menu
+	menu_show_hide: function()
+	{
+		// timer delay in ms, higher = better perf but less responsive ui
+		var menuTimer = 100;
+
+		// VARs
+		var win = $(window),
+			winPos = win.scrollTop(),
+			m  = $('#nav'), // nav selector
+			timerId,
+			newscroll,
+			up = false;
+
+		// Evil window scroll function
+		win.on('scroll', function()
+		{
+			clearTimeout(timerId);
+			timerId = setTimeout(function(){
+				newscroll = win.scrollTop();
+
+				newscroll > winPos && !up ? m.addClass('out') : m.removeClass('out');
+				winPos = newscroll;
+
+			}, menuTimer);
+		});
+
+		$('#goup').on('click', function(){
+			$('html, body').animate({
+				scrollTop: 0
+			}, 500);
+		})
+
 	}
 
 };

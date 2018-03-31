@@ -72,6 +72,7 @@
 	$dirs = (object) $conf['dirs'];
 
 	$conf['urls'] = [
+		'base' => $base_url,
 		'system' => $base_url . 'system/',
 		'results' => $base_url . 'results/',
 		'assets' => $base_url . 'assets/',

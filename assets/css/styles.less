@@ -81,9 +81,13 @@ td input[type=radio]{
 
 
 /* navbar */
-body { padding-top: 0; }
+body { padding-top: @spacing-double; }
 #nav {
-    section { margin: 0 auto; }
+    position: fixed; top: 0; left: 0; width: 100%;
+    z-index: 99;
+    will-change: transform;
+    backface-visibility: hidden;
+    section { margin: 0 auto; position: relative; z-index: 10; background: @color-darkest; }
     margin: 0 0 @spacing;
     color: @color-white;
     background: @color-darkest;
@@ -105,7 +109,6 @@ body { padding-top: 0; }
     }
 
     // menu
-
     &:hover .menu a { color: @color-brighter; }
     &:hover .menu a.on { color: @color-bright; }
     .menu {
@@ -121,6 +124,34 @@ body { padding-top: 0; }
             &.on { color: @color-white; }
         }
     }
+
+    // go-up
+    #goup {
+        width:0;height:0;
+        position:fixed;top:100%;right:0;
+        backface-visibility:hidden;
+        content:' ';
+        display:block;
+        border:15px solid;
+        border-color:transparent;
+        border-bottom-color: @color-darkest;
+        bottom:100%;left:20px;
+        transition: border-color .2s ease-out;
+        visibility:hidden;
+        transform:translateY(-100%);
+        transition:all .2s ease;
+        transition-delay:.2s;
+        cursor:pointer;
+    }
+
+    &.out #goup { visibility:visible; transform:none; z-index: 1; }
+
+    transition: transform .2s ease;
+
+    &.out {
+        transform: translateY(-90%);
+    }
+
 }
 
 
