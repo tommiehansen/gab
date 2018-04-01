@@ -96,6 +96,8 @@ body { padding-top: @spacing-double; }
     @bg: @color-secondary-darker;
     background: @bg;
 
+    background: linear-gradient(to right, @bg, @pink-700);
+
     // logo
     .logo {
         font-weight: @font-bold;
@@ -113,19 +115,19 @@ body { padding-top: @spacing-double; }
     }
 
     // menu
-    &:hover .menu a { color: @color-secondary-brightest; }
-    &:hover .menu a.on { color: @color-secondary-bright; }
+    &:hover .menu a { color: rgba(255,255,255,0.7); }
+    &:hover .menu a.on { color: rgba(255,255,255,0.4); }
     .menu {
         display: inline-block;
         &.right { float: right; }
         a {
             text-decoration: none;
-            color: @color-secondary-bright;
+            color: rgba(255,255,255,0.4);
             padding-left: @spacing-half;
             padding-right: @spacing-half;
             transition: color .3s ease;
-            &:hover { color: @color-white; }
-            &.on { color: @color-white; }
+            &:hover { color: rgba(255,255,255,1); }
+            &.on { color: rgba(255,255,255,0.8); }
         }
     }
 
