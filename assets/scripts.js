@@ -73,9 +73,13 @@ var talk = {
 /* GAB common functions */
 var gab = {
 
+	currentPage: false,
+	saving: false,
+
 	// auto init
 	init: function()
 	{
+		this.currentPage = this.getpage(); // set here
 		this.scratchpad();
 		this.menu_show_hide();
 	},
@@ -122,7 +126,7 @@ var gab = {
 	scratchpad: function()
 	{
 		let scratch = $('#scratchpad');
-		this.scratch_name = 'scratch_' + gab.getpage();
+		this.scratch_name = 'scratch_' + this.currentPage;
 
 		if( localStorage.getItem(this.scratch_name) ){
 			let sc = scratch.find('textarea')[0];
@@ -148,11 +152,38 @@ var gab = {
 	tr_check: function( el )
 	{
 		let input = el.find('input');
+
 		input.prop('checked', 'checked');
 		input.focus();
 		input.trigger('select');
 		el.parent().find('.checked').removeClass('checked');
 		el.addClass('checked');
+
+
+
+		// check if page = run (index)
+		if( this.currentPage == 'index' )
+		{
+			let datesField = $('#dates'),
+				options = JSON.parse(input.val()),
+				inputs = datesField.find('input');
+
+			inputs[0].value = options.from;
+			inputs[1].value = options.to;
+
+			// debounce saving event
+			(gab.debounce(function(){
+				if( !gab.saving ){
+					console.log('fire!');
+					gab.saving = true;
+					$('#gab_selectForm').sayt({'savenow': true});
+					setTimeout(function(){
+						gab.saving = false;
+					}, 800)
+				}
+			},1000))();
+		} // if index
+
 	},
 
 
