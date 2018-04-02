@@ -53,7 +53,11 @@
 	// web urls
 	$domain = $_SERVER['HTTP_HOST'];
 	$protocol = isset($_SERVER["HTTPS"]) ? 'https://' : 'http://';
-	if (strpos($domain, '/') !== false) { $domain .= '/'; } // add slash if not exist after domain
+
+	// add slash if not exist after domain
+	if( strpos($domain, '/') !== false ) { $domain .= '/'; }
+
+	// create base_url
 	$base_url = $protocol . $domain . substr(__DIR__, strlen($_SERVER[ 'DOCUMENT_ROOT' ]));
 	$base_url = str_replace('system', '', $base_url);
 
