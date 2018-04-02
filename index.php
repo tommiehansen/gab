@@ -130,6 +130,10 @@
 				// last always checked (since it has least data = failure to select won't take forever)
 				$key === $numDatasets-1 ? $selected = 'checked' : $selected = '';
 
+				// set dates (min-max)
+				$set['from'] = $dateFrom;
+				$set['to'] = $dateTo;
+
 				# get flay array
 				unset($set['numDays']);
 				$set_flat = json_encode(array_flatten($set));
@@ -150,13 +154,46 @@
 		?>
 
 	<section>
-		<button class="button-outline small right tip" data-tip="New data? Clear the cache and reload the page." onclick="ajax.get('./system/clear_cache.php?clearcache=yes','Cache was cleared.<br>Reload the page to get new datasets etc');return false;">Clear cache</button>
+		<a href="#" class="button button-outline small right tip" data-tip="New data? Clear the cache and reload the page." onclick="ajax.get('./system/clear_cache.php?clearcache=yes','Cache was cleared.<br>Reload the page to get new datasets etc');return false;">Clear cache</a>
 	</section>
+
+	<?php
+		# date fields
+		$date_fields = [
+			'from' => $dateFrom,
+			'to' => $dateTo,
+		];
+		$dates = '';
+		foreach( $date_fields as $key => $val )
+		{
+			$min = $date_fields['from'];
+			$max = $date_fields['to'];
+			$niceKey = ucfirst($key);
+
+			$dates .= "
+				<column>
+					<label for='$key'>$niceKey <small>Y-m-d eg: 2017-12-30</small></label>
+					<div class='tip error' data-tip='Error! Match the format e.g. 2017-12-30 (Year-month-date)'>
+						<input name='$key' class='tip' data-tip='Some stuff here' type='text' value='$val' placeholder='ex: 2017-12-30' maxlength='10' minlength='10' pattern='(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))'>
+					</div>
+				</column>
+			";
+
+			// add arrow
+			if( $key == 'from' ) $dates .= '<column class="arrow">&rarr;</column>';
+		}
+	?>
 
 	<section id="datasets">
 		<h3>Datasets</h3>
 		<input type="text" id="filter" placeholder="Type to filter datasets" autofocus>
-		<?= $str ?>
+		<?php echo $str; ?>
+
+		<a href="#" id="recent_daterange" class='button small button-outline right tip' data-tip="Load recently used custom date range">Load recently used</a>
+		<h4>Date range</h4>
+		<row id="dates">
+		<?php echo $dates; ?>
+		</row>
 	</section>
 
 
@@ -177,9 +214,9 @@
 		$strategy_names = array_keys($strategies);
 
 	?>
-
 	<section>
-		<button class="button-outline small right tip" data-tip="New strategies? Clear the cache and reload the page." onclick="ajax.get('./system/clear_cache.php?clearcache=yes','Cache was cleared.<br>Reload the page to get new datasets etc');return false;">Clear cache</button>
+		<hr>
+		<a href="#" class="button button-outline small right tip" data-tip="New strategies? Clear the cache and reload the page." onclick="ajax.get('./system/clear_cache.php?clearcache=yes','Cache was cleared.<br>Reload the page to get new datasets etc');return false;">Clear cache</a>
 	</section>
 
 	<section id="strategies">
@@ -211,6 +248,7 @@
 
 
 	<section>
+		<hr>
 		<h3>Other settings</h3>
 		<row>
 			<!-- CANDLE SIZE -->
@@ -260,7 +298,7 @@
 <!-- logger -->
 <section id="logger">
 	<hr>
-	<h3>Log</h3> <button class="button-outline small" id="log_clear">CLEAR</button>
+	<h3>Log</h3> <button class="button-outline small right" id="log_clear">CLEAR</button>
 	<pre id="log_stat"><u>Status</u> <span id="log_status">Idle</span>  <u>Completed</u> <span id="log_runs">0</span>  <u>Duration</u> <span id="log_duration">0h 0m 0s</span></pre>
 	<pre id="logs" class="hidden"></pre>
 </section>

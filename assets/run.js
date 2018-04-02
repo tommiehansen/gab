@@ -17,6 +17,74 @@ datasets.on('click', 'tr', function(){
     gab.tr_check($(this));
 })
 
+let dates = datasets.find('#dates');
+dates.on('blur', 'input', function(){
+    let dateObject = {},
+        inputs = dates.find('input');
+
+    dateObject.from = inputs[0].value;
+    dateObject.to = inputs[1].value;
+
+    // set
+    localStorage.setItem('exchangeDates', JSON.stringify( dateObject ));
+
+    // check errors
+    dateCheck(this);
+});
+
+function dateMask( el )
+{
+	let val = el.value,
+			len = val.length,
+			key = event.keyCode;
+
+	// dash = return (prevent double dash)
+	if( key == 8 ) return true;
+
+	// auto-add dashes
+	if( len === 4 && key !== 189 || len === 7 && key !== 189 ) { el.value += '-'; }
+	else if( len === 5 && val[len-1] !== '-' ) el.value = val.slice(0, -1) + '-';
+	else if( len === 8 && val[len-1] !== '-' ) el.value = val.slice(0, -1) + '-';
+}
+
+function dateCheck( el ){
+    // add or remove error
+    if( !el.checkValidity() )
+    {
+        el.classList.add('error');
+        el.parentNode.classList.add('focus');
+    }
+    else {
+        el.classList.remove('error');
+        el.parentNode.classList.remove('focus');
+    }
+}
+
+// enable mask
+dates.on('keyup', 'input', function(){
+    dateMask(this);
+});
+
+
+
+datasets.on('click', '#recent_daterange', function(e){
+    e.preventDefault()
+    e.stopPropagation();
+
+    let ls = localStorage.getItem('exchangeDates');
+    if( ls ){
+        ls = JSON.parse(ls);
+        let dateFields = $('#dates').find('input');
+
+        dateFields[0].value = ls.from;
+        dateFields[1].value = ls.to;
+        ajax.msg('Loaded recently used date range');
+    }
+    else {
+        ajax.msg('Nothing saved so cannot load');
+    }
+});
+
 
 
 /* strat selection */
@@ -97,7 +165,7 @@ selectForm.on('change', function(){
 	$(this).sayt({'savenow': true});
 })
 
-// fix color selction
+// fix color selection
 datasets.find('tr').removeClass('checked');
 datasets.find(':checked').parents('tr').addClass('checked');
 

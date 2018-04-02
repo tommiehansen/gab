@@ -32,6 +32,18 @@
     $history_size = _P('history_size');
     $debug = _P('debug');
 
+    // change dataset
+    if(_P('from'))
+    {
+        $dateFrom = _P('from');
+        $dateTo = _P('to');
+        $ds = json_decode($dataset);
+        #prp($ds);
+        $ds->from = _P('from');
+        $ds->to = _P('to');
+        $dataset = json_encode($ds);
+    }
+
     // check if debug mode
     if( $debug === 'true' ){ $debug = true; }
     else { $debug = false; }

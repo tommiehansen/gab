@@ -174,7 +174,6 @@ var gab = {
 			// debounce saving event
 			(gab.debounce(function(){
 				if( !gab.saving ){
-					console.log('fire!');
 					gab.saving = true;
 					$('#gab_selectForm').sayt({'savenow': true});
 					setTimeout(function(){

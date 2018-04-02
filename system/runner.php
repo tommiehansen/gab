@@ -54,20 +54,11 @@ foreach($strat_post as $key => $val ){
 # NOTE: Gekko doesn't seem to accept date format ?!, needsfix
 date_default_timezone_set('UTC');
 
-// cli sends data in Y-m-d 00:00:00 format so need to convert
-if(_P('cli'))
-{
-	$jsFrom = date('Y-m-d\TH:i:s\Z', strtotime($settings->from));
-	$jsTo = date('Y-m-d\TH:i:s\Z', strtotime($settings->to));
-	$dbFrom = date('Y-m-d', strtotime($settings->from));
-	$dbTo = date('Y-m-d', strtotime($settings->to));
-}
-else {
-	$jsFrom = date('Y-m-d\TH:i:s\Z', $settings->from);
-	$jsTo = date('Y-m-d\TH:i:s\Z', $settings->to);
-	$dbFrom = date('Y-m-d', $settings->from);
-	$dbTo = date('Y-m-d', $settings->to);
-}
+// we're sending data in Y-m-d 00:00:00 format so need to convert
+$jsFrom = date('Y-m-d\TH:i:s\Z', strtotime($settings->from));
+$jsTo = date('Y-m-d\TH:i:s\Z', strtotime($settings->to));
+$dbFrom = date('Y-m-d', strtotime($settings->from));
+$dbTo = date('Y-m-d', strtotime($settings->to));
 
 $settings = [
 	'candle_size' => (int) $candle_size,

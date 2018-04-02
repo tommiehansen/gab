@@ -38,7 +38,11 @@ body > section:last-of-type { margin-bottom: @spacing-double * 4; }
 
 .inline { display: inline-block; }
 .right { float: right; }
+
+/* headers */
 hr + h1, hr + h2, hr + h3, hr + h4 { margin-top: 0 }
+
+/* hr */
 hr { padding-top: @spacing-double; margin-bottom: @spacing-double*2; }
 
 // small stuff
@@ -104,6 +108,7 @@ body { padding-top: @spacing-double; }
         float: left;
         margin-right: @spacing;
         font-size: @font-size-large;
+        color: @color-white;
         transition: all .5s ease;
     }
 
@@ -174,7 +179,13 @@ body { padding-top: @spacing-double; }
 
 /* forms */
 input, textarea { transition: border-color .2s ease; transition-property: border-color, background; }
-label small { display: inline-block; font-size: @font-size-smaller; }
+label small {
+    display: inline-block;
+    font-size: @font-size-small;
+    color: @color-bright;
+    margin-left: @spacing-half/2;
+}
+
 body form column {
     margin-bottom: @spacing-quarter;
 }
@@ -187,6 +198,30 @@ input[type=submit].on {
         background: @red-700;
         border-color: @red-700;
     }
+}
+
+// errors
+input {
+    &.error {
+        border-color: @red-500;
+        color: @red-500;
+        animation: alternate errorFlash .5s linear infinite;
+        &:focus { animation: none; color: @color-darkest; }
+        &::after {
+            content: ' xxx ';
+            display: block;
+            position: relative;
+        }
+    }
+}
+
+#dates column {
+    position: relative;
+}
+
+@keyframes errorFlash {
+    0% { border-color: @red-500; }
+    100% { border-color: @color-brightest; }
 }
 
 // buttons
@@ -208,6 +243,19 @@ input[type=submit].on {
             }
         }
     }
+}
+
+// column arrow (middle spacer with arrow)
+column.arrow {
+    max-width: 10px;
+    width: 10px;
+    margin-left: 0; margin-right: 0;
+    text-align: center;
+    line-height: 1;
+    font-size: 3rem;
+    padding: @spacing-double 0 0; // ugly hack
+    margin-left: -5px;
+    color: @color-bright;
 }
 
 
@@ -457,6 +505,7 @@ body,html { height: 100%; }
         opacity: 0;
         transition: all .2s ease-in; // OUT (reversed)
         transition-delay: 0;
+        z-index: 9999;
     }
 
     // tooltip area
@@ -508,6 +557,44 @@ body,html { height: 100%; }
         transition-duration: .05s;
         transition-delay: 0;
     }
+
+    &.error {
+        &:hover {
+            &:after, &:before {
+                visibility: hidden;
+                opacity: 0;
+            }
+        }
+        &:after, &:before {
+            bottom: 150%;
+        }
+        &:after {
+            background: @red-500;
+            line-height: 1.5;
+        }
+        &:before {
+            border-top-color: @red-500;
+        }
+    }
+
+    &.focus {
+        &:hover {
+            &:after, &:before {
+                visibility: inherit;
+                opacity: inherit;
+            }
+        }
+        &:after, &:before {
+            visibility: visible;
+            opacity: 1;
+            bottom: 150%;
+        }
+        &:after {
+            color: @red-50;
+        }
+    }
+
+
 
 }
 
