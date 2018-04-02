@@ -57,3 +57,5 @@ sqlite_stuff.txt
 *.txt
 cli/settings.sh
 cli/*.sh
+user.config.php
+sync.sh

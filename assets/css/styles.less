@@ -23,6 +23,7 @@
 @import '_buttons.less';
 @import '_forms.less';
 @import '_cards.less';
+@import '_center_vertical.less';
 
 
 
@@ -61,6 +62,12 @@ button.button-secondary, .button.button-secondary {
     line-height: @spacing;
     height: auto;
     font-size: @font-size-large;
+}
+
+ol,ul { margin-bottom: @spacing; }
+ol, ol li {
+   list-style-type: decimal;
+   list-style-position: inside;
 }
 
 
