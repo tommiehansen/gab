@@ -271,8 +271,6 @@
 		$arr['status'] = $status;
 		$arr = (object) $arr;
 
-		echo print_r( curl_getinfo($curl) );
-
 		curl_close($curl);
 
 		return $arr;
