@@ -182,8 +182,6 @@ $db->beginTransaction();
 	$db->query($sql);
 
 
-
-
 	/* check if run already exist */
 
 	# check if id already exist
@@ -209,7 +207,9 @@ if( $hasRan )
 $url = $conf->endpoints->backtest;
 $curl = curl_post($url, json_encode($gconf));
 
-if( $curl->status !== 200 ){ die('Runner.php ERROR: Get from curl_post() returned status: ' . $curl->status); }
+if( $curl->status !== 200 ){
+	die('Runner.php ERROR: Get from curl_post() returned status: ' . $curl->status);
+}
 
 $get = json_decode($curl->data);
 unset($get->candles);
@@ -405,13 +405,24 @@ if( $profitStrategy > $profitMarket && $profitStrategy !== 0 )
 {
 	$calc = number_format($profitStrategy - $profitMarket) . '%';
 	$percentProfit = number_format($report->relativeProfit) . '%';
-	echo "<u class='success'>Success!</u> Performed $calc better";
+	$str = "<u class='success'>Success!</u> Performed $calc better";
 }
 else
 {
 	$calc = number_format($profitMarket - $profitStrategy) . '%';
-	echo "<u class='bad'>Bad!</u> Performed $calc worse then market";
+	$str = "<u class='bad'>Bad!</u> Performed $calc worse then market";
 }
+
+if( $conf->multiserver )
+{
+	$server = $conf->endpoints->backtest;
+	$server = explode(':', $server)[1]; // hide ports etc
+	$server = str_replace('//','', $server);
+	$server = explode('.', $server)[0];
+	$str .= " <u class='notice'>@ $server";
+}
+
+echo $str;
 
 
 $db = null;

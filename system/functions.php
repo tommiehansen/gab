@@ -257,12 +257,13 @@
 		$curl = curl_init($url);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, TRUE);
-		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json",'Accept-Encoding: gzip,deflate'));
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-Type: application/json",'Accept-Encoding: gzip,deflate'));
 		curl_setopt($curl, CURLOPT_POSTFIELDS, $vars);
 		curl_setopt($curl, CURLOPT_POST, true);
-		curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 120);
 		curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
+		curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 120);
+
 		$data = curl_exec($curl);
 		$status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 

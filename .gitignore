@@ -59,3 +59,4 @@ cli/settings.sh
 cli/*.sh
 user.config.php
 sync.sh
+testing.php
