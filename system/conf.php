@@ -53,6 +53,7 @@
 	// web urls
 	$domain = $_SERVER['HTTP_HOST'];
 	$protocol = isset($_SERVER["HTTPS"]) ? 'https://' : 'http://';
+	if (strpos($domain, '/') !== false) { $domain .= '/'; } // add slash if not exist after domain
 	$base_url = $protocol . $domain . substr(__DIR__, strlen($_SERVER[ 'DOCUMENT_ROOT' ]));
 	$base_url = str_replace('system', '', $base_url);
 
@@ -111,7 +112,7 @@
 	// turn to object
 	$conf = json_decode(json_encode($conf));
 
-	#echo '<pre>'; print_r($conf); echo '</pre>';
+	#echo '<pre>'; print_r($conf); echo '</pre>'; exit;
 
 	/* set large defaults for PHP */
 	error_reporting(E_ALL);
