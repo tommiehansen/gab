@@ -103,16 +103,16 @@
 
 			'blobs' => [
 				'id' => 'TEXT PRIMARY KEY UNIQUE',
-				'report' => 'BLOB',
-				'roundtrips' => 'BLOB',
+				'report' => 'BLOB NOT NULL',
+				'roundtrips' => 'BLOB NOT NULL',
 			],
 
 			'results' => [
 				'id' => 'TEXT PRIMARY KEY UNIQUE',
-				'candle_size' => 'INTEGER',
-				'strategy_profit' => 'INTEGER',
-				'market_profit' => 'INTEGER',
-				'sharpe' => 'REAL',
+				'candle_size' => 'INTEGER NOT NULL',
+				'strategy_profit' => 'INTEGER NOT NULL',
+				'market_profit' => 'INTEGER NOT NULL',
+				'sharpe' => 'REAL NOT NULL',
 				'alpha' => 'REAL',
 				'trades' => 'INTEGER',
 				'trades_win' => 'INTEGER',
