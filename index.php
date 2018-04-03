@@ -274,7 +274,7 @@
 			<!-- THREADS -->
 			<column>
 				<label for="threads">Threads <small>Number of threads</small></label>
-				<input type="number" min="1" max="15" maxlength="2" name="threads" id="threads" value="3" placeholder="Note: Too many threads will not always speed things up.">
+				<input type="number" min="1" max="30" maxlength="2" name="threads" id="threads" value="3" placeholder="Note: Too many threads will not always speed things up.">
 			</column>
 		</row>
 
