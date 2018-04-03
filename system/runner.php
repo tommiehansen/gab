@@ -204,7 +204,7 @@ else {
 
 	# check if id already exist
 	$q = $db->query("SELECT id FROM runs WHERE id = '$run_id'");
-	$runs = @$q->fetchAll();
+	@$runs = $q->fetchAll();
 	empty( $runs ) ? $hasRan = false : $hasRan = true;
 }
 
@@ -249,7 +249,7 @@ $db->beginTransaction();
 		$profitStrategy = $report->relativeProfit;
 
 		# beat the market, add 'true' to 'success'
-		if( $profitStrategy > $profitMarket ){
+		if( $profitStrategy > $profitMarket && $profitStrategy !== 0 ){
 			$q->execute([$run_id, 'true']);
 		}
 		# did not beat market, add 'false' to 'success'
@@ -369,7 +369,7 @@ $db->beginTransaction();
 
 			/* set array with all data to be written */
 			$t = (object) $trades;
-			$arr = [
+			$results_arr = [
 				$run_id,
 				$settings['candle_size'],
 				"$relativeProfit",
@@ -389,7 +389,7 @@ $db->beginTransaction();
 				gzencode(json_encode($strat, true)),
 			];
 
-			$results->execute($arr);
+
 
 			# BLOBS
 			$sql = "INSERT INTO blobs (";
@@ -412,6 +412,8 @@ $db->beginTransaction();
 				$roundtrips_blob,
 			];
 
+			# execute all
+			$results->execute($results_arr);
 			$blobs->execute($blobs_arr);
 
 		} // end profitStrategy > market
