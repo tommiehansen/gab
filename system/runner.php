@@ -204,8 +204,10 @@ if( $hasRan )
 }
 
 /* RUN */
+$timer_start = timer_start(); // start timer
 $url = $conf->endpoints->backtest;
 $curl = curl_post($url, json_encode($gconf));
+$timer_end = timer_end($timer_start); // returns seconds
 
 if( $curl->status !== 200 ){
 	die('Runner.php ERROR: Get from curl_post() returned status: ' . $curl->status);
@@ -413,12 +415,17 @@ else
 	$str = "<u class='bad'>Bad!</u> Performed $calc worse then market";
 }
 
+$str .= " <u class='notice'>[{$timer_end} @ {$candle_size}min candle]</u>";
+
 if( $conf->multiserver )
 {
 	$server = $conf->endpoints->backtest;
 	$server = explode(':', $server)[1]; // hide ports etc
 	$server = str_replace('//','', $server);
-	$server = explode('.', $server)[0];
+	#$server = explode('.', $server)[0];
+	if( !contains('localhost', $server ) ){
+		$server = substr($server, 0, 3) . '***'; // hide servers..
+	}
 	$str .= " <u class='notice'>@ $server";
 }
 

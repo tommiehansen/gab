@@ -132,10 +132,13 @@
 	function timer_start(){ $a =  microtime(true); return $a; }
 	function timer_end($start){
 		$end = microtime(true);
-		$creationtime = ($end - $start);
-		echo '<div id="timer" style="position:fixed;background:#fff;backface-visibility:hidden;top:20px;right:20px;font-family:monospace;font-size:14px;color:#aaa;">';
-		printf("%.6f sec", $creationtime);
-		echo "</div>";
+		$diff = ($end-$start); // seconds
+		$diff = round($diff*100)/100;
+		
+		// conver to minutes
+		if( $diff > 65 ) { $diff = round(($diff/60)*10)/10 . 'min'; }
+		else { $diff = $diff . 's'; } // or just use seconds
+		return $diff;
 	}
 
 
