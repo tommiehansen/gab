@@ -188,7 +188,7 @@ if( !file_exists($db_file) )
 	$db->query($sql);
 
 	# set hasRan to false (since no runs...)
-	$hasRan = false;
+	$hasRan = false; 
 
 } // if !file_exists
 else {
