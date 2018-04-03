@@ -198,8 +198,8 @@
 					<hr>
 					<h6>Do this</h6>
 					<ol>
-						<li>Make a copy of <b>user.config.sample.php</b>
-						<li>Modify it to suit your needs and rename it to <b>user.config.php</b></li>
+						<li>Make a copy of <b>system/user.config.sample.php</b>
+						<li>Modify it to suit your needs and rename it to <b>system/user.config.php</b></li>
 						<li>See if it bloody works</li>
 					</ol>
 					<p>You can also perform a simple compatibility check by visiting <a href='sanitycheck.php'>sanitycheck.php</a></p>
