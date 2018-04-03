@@ -187,14 +187,13 @@ $db->beginTransaction();
 	# check if id already exist
 	$q = $db->query("SELECT id FROM runs WHERE id = '$run_id'");
 	$runs = $q->fetchAll();
+	empty( $runs ) ? $hasRan = false : $hasRan = true;
 
 # commit above
 $db->commit();
 
 # start again
 $db->beginTransaction();
-
-empty( $runs ) ? $hasRan = false : $hasRan = true;
 
 if( $hasRan )
 {
