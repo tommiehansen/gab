@@ -204,7 +204,7 @@ else {
 
 	# check if id already exist
 	$q = $db->query("SELECT id FROM runs WHERE id = '$run_id'");
-	$runs = $q->fetchAll();
+	$runs = @$q->fetchAll();
 	empty( $runs ) ? $hasRan = false : $hasRan = true;
 }
 
