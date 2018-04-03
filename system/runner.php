@@ -422,7 +422,6 @@ if( $conf->multiserver )
 	$server = $conf->endpoints->backtest;
 	$server = explode(':', $server)[1]; // hide ports etc
 	$server = str_replace('//','', $server);
-	#$server = explode('.', $server)[0];
 	if( !contains('localhost', $server ) ){
 		$server = substr($server, 0, 3) . '***'; // hide servers..
 	}

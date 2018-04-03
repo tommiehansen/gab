@@ -132,9 +132,9 @@
 	function timer_start(){ $a =  microtime(true); return $a; }
 	function timer_end($start){
 		$end = microtime(true);
-		$diff = ($end-$start); // seconds
+		$diff = ($end-$start); // secondsls
 		$diff = round($diff*100)/100;
-		
+
 		// conver to minutes
 		if( $diff > 65 ) { $diff = round(($diff/60)*10)/10 . 'min'; }
 		else { $diff = $diff . 's'; } // or just use seconds
