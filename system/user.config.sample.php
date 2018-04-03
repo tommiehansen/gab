@@ -38,6 +38,21 @@ define('SERVER_TIMEOUT', 600); // seconds, 600 = 10 minutes
 
 
 /*
+    *** ORIGIN SETTINGS ***
+    default: false
+
+    Creates subdomains for all requests via ajax to post.php @ UI
+    to increase max concurrent threads and circumvent max allowed by browser.
+
+    NOTE: This requires
+    1. That the server you're running GAB on accepts wildcard subdomains
+    2. That you can set http header via PHP: header('Access-Control-Allow-Origin: *');
+*/
+
+$allow_origin = false;
+
+
+/*
     ADVANCED SETTINGS
     Do not do this if you don't know what you're doing
 
@@ -60,4 +75,5 @@ define('SERVER_TIMEOUT', 600); // seconds, 600 = 10 minutes
     YES -- You can remove all these comments and just have this in your user.config.php
     $server = 'http://localhost:3000';
     define('SERVER_TIMEOUT', 900);
+    $allow_origin = false;
 */

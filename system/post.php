@@ -1,4 +1,9 @@
 <?php
+    require_once 'conf.php';
+    if( $conf->allow_origin ){
+        header('Access-Control-Allow-Origin: *');
+    }
+
     /*
         POST
         Deals with POSTS in our invented psuedo-TOML files
@@ -16,7 +21,6 @@
     #exit;
 
     # init
-    require_once 'conf.php';
     require_once $conf->dirs->system . 'functions.php';
     require_once $conf->dirs->system . 'class.gab.php';
     $gab = new \GAB\core($conf);
@@ -188,6 +192,17 @@
             $domain = $_SERVER['HTTP_HOST'];
             $prefix = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
             $dir = dirname($_SERVER['PHP_SELF']);
+
+            // fix subdomains
+            if( $conf->allow_origin )
+            {
+                if( contains('gab', $domain) ){
+                    $d = explode('.', $domain); // so user can have gab90.host.host.com
+                    unset($d[0]); // remove first e.g. gab90
+                    $d = implode('.', $d); // then put back together
+                    $domain = $d;
+                }
+            }
 
             $post = curl_post2($prefix . $domain . $dir . '/runner.php', $q); // this echo entire <html>...
             if( $isCli ) $post = strip_tags($post);

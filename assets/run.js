@@ -189,7 +189,8 @@ var runCount = 0,
     elapsedTime = 0,
     stopAll = false,
     logLineLength = 50,
-    maxNoResultsRuns = 100;
+    maxNoResultsRuns = 100,
+    form_url_orig;
 
 $(document).ajaxSend(function(e, jqXHR, options){
     xhrPool.push(jqXHR);
@@ -231,6 +232,8 @@ f.on('submit', function(e){
         noResultRuns = 0, // reset
         threads = f.find('#threads')[0].value,
         sub = $('#submit');
+
+    form_url_orig = form_url; // save for later use
 
     // check if debug mode
     if( $('#debug').data('debug') === 'true' ){
@@ -293,20 +296,28 @@ f.on('submit', function(e){
     }
 
 
-
+    // check if access-origin
+    var conf = JSON.parse($('#conf').text()),
+        allow_origin = conf.allow_origin;
 
     /* init multi threads */
     var len = threads.length, i = 0;
     while(threads--){
-        jax_multi(form_url, serialized, timeout, maxNoResultsRuns);
+        jax_multi(form_url, serialized, timeout, maxNoResultsRuns, allow_origin);
     }
 
 })
 
-function jax_multi(form_url, serial, timeout, maxNoResultsRuns ){
+function jax_multi(form_url, serial, timeout, maxNoResultsRuns, allow_origin ){
 
     if( noResultRuns < maxNoResultsRuns+1 )
     {
+        // create subdomains to increase max-threads
+        if( allow_origin )
+        {
+            let rand = Math.floor(Math.random()*100);
+            form_url = form_url_orig.replace('://','://gab' + rand + '.');
+        }
 
         $.ajax({
             type: "POST",
@@ -351,13 +362,13 @@ function jax_multi(form_url, serial, timeout, maxNoResultsRuns ){
                 noResultRuns = 0; // reset since there seems to be runs left
             }
 
-            jax_multi(form_url, serial, timeout, maxNoResultsRuns);
+            jax_multi(form_url, serial, timeout, maxNoResultsRuns, allow_origin);
 
             },
             error: function(){
                 if( !stopAll ){ // this is reversed logic...
                     $('#logs').prepend("Error -- running again..\n");
-                    jax_multi(form_url, serial, timeout, maxNoResultsRuns);
+                    jax_multi(form_url, serial, timeout, maxNoResultsRuns, allow_origin);
                 }
                 else {
                     $('#log_status').text('Stopped: Press RUN IT! to run again.');

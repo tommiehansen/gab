@@ -20,6 +20,10 @@
 		require_once $system_path . 'user.config.php';
 
 		/* general conf */
+		# force allow origin * (for more threads)
+		if( $allow_origin ){ $conf['allow_origin'] = true; }
+		else { $conf['allow_origin'] = false; }
+
 		# cache
 		$conf['cache'] = [
 			'cache_dir' => 'cache/',
