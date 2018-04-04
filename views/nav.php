@@ -13,9 +13,8 @@
 ?>
 <div id="nav">
 	<section>
-		<i class="logo">GAB</i>
 		<?php
-			$left = '<div class="menu">';
+			$left = '<div class="menu"><i class="logo tip tip--bottom tip--pink">gabby</i>';
 			$right = '<div class="menu right">';
 
 			foreach( $nav_pages as $key => $arr )

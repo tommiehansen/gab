@@ -216,11 +216,10 @@ var gab = {
 	menu_show_hide: function()
 	{
 		// timer delay in ms, higher = better perf but less responsive ui
-		var menuTimer = 100;
+		var menuTimer = 150;
 
 		// VARs
 		var win = $(window),
-			winPos = win.scrollTop(),
 			m  = $('#nav'), // nav selector
 			timerId,
 			newscroll,
@@ -231,14 +230,12 @@ var gab = {
 		{
 			clearTimeout(timerId);
 			timerId = setTimeout(function(){
-				newscroll = win.scrollTop();
-
-				newscroll > winPos && !up ? m.addClass('out') : m.removeClass('out');
-				winPos = newscroll;
-
+				scrollTop = win.scrollTop();
+				scrollTop > 50 ? m.addClass('out') : m.removeClass('out');
 			}, menuTimer);
 		});
 
+		// go-up func
 		$('#goup').on('click', function(){
 			$('html, body').animate({
 				scrollTop: 0
