@@ -237,8 +237,6 @@ if( $curl->status !== 200 )
 	$str = "Runner.php ERROR: Running config via curl_post() did not return data.\n";
 	if( $curl->status == 0 ) $curl->status = '0 - No data';
 	$str .= "url: $url | curl status: " . $curl->status . "\n";
-	#$str .= "Gekko conf:\n";
-	#$str .= print_r($gconf);
 	die();
 }
 
