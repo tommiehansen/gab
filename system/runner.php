@@ -199,13 +199,16 @@ else {
 	$db->exec('PRAGMA temp_store=MEMORY');
 	$db->exec('PRAGMA auto_vacuum=OFF');
 
-	$db->beginTransaction();
-
-		# check if id already exist
+	# check if id already exist
+	try
+	{
 		$q = $db->query("SELECT id FROM runs WHERE id = '$run_id'");
-		@$runs = $q->fetchAll();
-
-	$db->commit();
+		$runs = $q->fetchAll();
+	} catch (\Exception $e) {
+		echo "<u class='notice'>Notice: Could not fetch run_id so skipping...</u>";
+		$db = null;
+		exit;
+	}
 
 	empty( $runs ) ? $hasRan = false : $hasRan = true;
 }
