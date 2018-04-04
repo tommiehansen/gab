@@ -406,7 +406,7 @@ $db->beginTransaction();
 			$report_blob = gzencode(json_encode($report));
 			$roundtrips_blob = gzencode(json_encode($get->roundtrips));
 
-			// check
+			// check it
 			if( !$report_blob || !$roundtrips_blob )
 			{
 				echo 'Runner.php error: Something wrong with report or roundtrips';
