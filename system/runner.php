@@ -208,7 +208,7 @@ else {
 	{
 		$q = $db->query("SELECT id FROM runs WHERE id = '$run_id'");
 		@$runs = @$q->fetchAll();
-	} catch (\Exception $e) {
+	} catch (\Exception $e){
 		echo "<u class='notice'>Notice: Could not fetch run_id so skipping...</u>";
 		$db = null;
 		exit;
