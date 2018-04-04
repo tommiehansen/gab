@@ -38,7 +38,7 @@ $settings = json_decode(_P('dataset'));
 
 @$strat = [ $strat_name => $gab->get_strategies()[$strat_name] ]; // returns array
 
-if( !$strat[$strat_name] ) die('Could not find strategy or it does not have a valid TOML file');
+if( !$strat[$strat_name] ) die('Runner.php ERROR: Could not find strategy or it does not have a valid TOML file, server down or bad files?');
 
 # ..then set if params set
 foreach($strat_post as $key => $val ){
