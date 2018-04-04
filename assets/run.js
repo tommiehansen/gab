@@ -259,6 +259,7 @@ f.on('submit', function(e){
 
         $('#log_runs').text('0'); // reset
         $('#log_duration').text('0h 0m 0s'); // reset
+        document.title = 'GAB: Run strategy';
 
         // NOTE: no way to kill Gekko itself since backtests doesnt return Gekko run id
 
@@ -342,6 +343,9 @@ function jax_multi(form_url, serial, timeout, maxNoResultsRuns, allow_origin ){
                 // set runCount
                 runCount++;
                 $('#log_runs').text(runCount);
+
+                // set document title
+                document.title = 'GAB: ' + runCount + ' completed';
 
                 // check if no. of pre-lines is too massive and cut..
                 let lines = logs.html().split('\n');
