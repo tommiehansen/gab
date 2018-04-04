@@ -204,10 +204,11 @@ else {
 	$db->exec('PRAGMA auto_vacuum=OFF');
 
 	# check if id already exist
-	$q = $db->query("SELECT id FROM runs WHERE id = '$run_id'");
-	@$runs = @$q->fetchAll();
-	if( !$runs )
+	try
 	{
+		$q = $db->query("SELECT id FROM runs WHERE id = '$run_id'");
+		@$runs = @$q->fetchAll();
+	} catch (\Exception $e) {
 		echo "<u class='notice'>Notice: Could not fetch run_id so skipping...</u>";
 		$db = null;
 		exit;
