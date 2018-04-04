@@ -231,15 +231,30 @@ $url = $conf->endpoints->backtest;
 $curl = curl_post($url, json_encode($gconf));
 $timer_end = timer_end($timer_start); // returns seconds
 
-if( $curl->status !== 200 ){
-	die('Runner.php ERROR: Get from curl_post() returned status: ' . $curl->status);
+# check curl status
+if( $curl->status !== 200 )
+{
+	$str = "Runner.php ERROR: Running strategy via curl_post() did not return data.\n";
+	$str .= "url: $url | curl status: " . $curl->status;
+	$str .= "Gekko conf:\n";
+	$str .= json_encode($gconf);
+	die($str);
 }
 
 $get = json_decode($curl->data);
-unset($get->candles);
-#prp($get);
 
-if( !$get ) die('Runner.php ERROR: Get from curl_post() did not return data, something is wrong');
+# check if decoding worked
+if( !$get )
+{
+	$str = "Runner.php ERROR: Running strategy via curl_post() did not return data.\n";
+	$str .= "url: $url | curl status: " . $curl->status;
+	$str .= "Gekko conf:\n";
+	$str .= $gconf;
+	die($str);
+}
+
+// remove all candles
+unset($get->candles);
 
 try {
 
