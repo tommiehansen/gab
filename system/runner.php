@@ -156,7 +156,7 @@ if( !file_exists($db_file) )
 
 	# settings
 	$db->exec("PRAGMA synchronous=OFF");
-	$db->exec('PRAGMA journal_mode=WAL'); // MEMORY
+	$db->exec('PRAGMA journal_mode=MEMORY'); // MEMORY
 	$db->exec('PRAGMA temp_store=MEMORY');
 	$db->exec('PRAGMA auto_vacuum=OFF');
 
