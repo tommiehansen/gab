@@ -234,11 +234,11 @@ $timer_end = timer_end($timer_start); // returns seconds
 # check curl status
 if( $curl->status !== 200 )
 {
-	$str = "Runner.php ERROR: Running strategy via curl_post() did not return data.\n";
-	$str .= "url: $url | curl status: " . $curl->status;
+	$str = "Runner.php ERROR: Running config via curl_post() did not return data.\n";
+	$str .= "url: $url | curl status: " . $curl->status . "\n";
 	$str .= "Gekko conf:\n";
-	$str .= json_encode($gconf);
-	die($str);
+	$str .= print_r($gconf);
+	die();
 }
 
 $get = json_decode($curl->data);
@@ -246,10 +246,8 @@ $get = json_decode($curl->data);
 # check if decoding worked
 if( !$get )
 {
-	$str = "Runner.php ERROR: Running strategy via curl_post() did not return data.\n";
-	$str .= "url: $url | curl status: " . $curl->status;
-	$str .= "Gekko conf:\n";
-	$str .= $gconf;
+	$str = "Runner.php ERROR: JSON decode did not work.\n";
+	$str .= "url: $url | curl status: " . $curl->status . "\n";
 	die($str);
 }
 
