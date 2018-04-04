@@ -126,7 +126,12 @@ $run_id = $str;
 
 
 
-/* DATABASE */
+
+/* -----------------------------------------
+
+	DATABASE OPERATIONS
+
+----------------------------------------- */
 
 # create name for db [exchange_asset]
 $fromTo = $dbFrom . '--' . $dbTo; // add dateRange (simple)
@@ -150,7 +155,6 @@ if( !file_exists($db_file) )
 	$db	= new PDO($dir) or die("Error creating database file"); // creates the file
 
 	# settings
-	#$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	$db->exec("PRAGMA synchronous=OFF");
 	$db->exec('PRAGMA journal_mode=WAL'); // MEMORY
 	$db->exec('PRAGMA temp_store=MEMORY');
@@ -188,12 +192,12 @@ if( !file_exists($db_file) )
 	$hasRan = false;
 
 } // if !file_exists
+// so file does exist...
 else {
 	$dir = "sqlite:" . $db_file;
 	$db	= new PDO($dir) or die("Error creating database file");
 
 	# settings
-	#$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	$db->exec("PRAGMA synchronous=OFF");
 	$db->exec('PRAGMA journal_mode=MEMORY'); // MEMORY
 	$db->exec('PRAGMA temp_store=MEMORY');
