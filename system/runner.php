@@ -146,7 +146,6 @@ $results_fields = (array) $conf->db_fields->results;
 
 # database setup
 $db_file = $conf->dirs->results . $file;
-$db = null;
 
 # check if file already exists and don't repeat queries ...
 if( !file_exists($db_file) )
@@ -155,10 +154,12 @@ if( !file_exists($db_file) )
 	$db	= new PDO($dir) or die("Error creating database file"); // creates the file
 
 	# settings
-	$db->exec("PRAGMA synchronous=OFF");
-	$db->exec('PRAGMA journal_mode=MEMORY'); // MEMORY
-	$db->exec('PRAGMA temp_store=MEMORY');
-	$db->exec('PRAGMA auto_vacuum=OFF');
+	$db->exec("
+		PRAGMA journal_mode=MEMORY;
+		PRAGMA temp_store=MEMORY;
+		PRAGMA auto_vacuum=OFF;
+		PRAGMA default_cache_size=10000
+	");
 
 	# create runs table
 	$sql = "
@@ -197,22 +198,26 @@ else {
 	$dir = "sqlite:" . $db_file;
 	$db	= new PDO($dir) or die("Error creating database file");
 
-	# settings
-	$db->exec("PRAGMA synchronous=OFF");
-	$db->exec('PRAGMA journal_mode=MEMORY'); // MEMORY
-	$db->exec('PRAGMA temp_store=MEMORY');
-	$db->exec('PRAGMA auto_vacuum=OFF');
+	$db->exec("
+		PRAGMA journal_mode=MEMORY;
+		PRAGMA temp_store=MEMORY;
+		PRAGMA auto_vacuum=OFF;
+		PRAGMA default_cache_size=10000
+	");
 
 	# check if id already exist
-	try
-	{
-		$q = $db->query("SELECT id FROM runs WHERE id = '$run_id'");
-		@$runs = @$q->fetchAll();
-	} catch (\Exception $e){
+	$q = $db->query("SELECT id FROM runs WHERE id = '$run_id'");
+
+
+	if( $q ){
+		$runs = $q->fetchAll();
+	}
+	else {
 		echo "<u class='notice'>Notice: Could not fetch run_id so skipping...</u>";
-		$db = null;
+		unset($db);
 		exit;
 	}
+
 
 	empty( $runs ) ? $hasRan = false : $hasRan = true;
 }
@@ -452,7 +457,7 @@ try {
 catch(Exception $e){
 	echo $e->getMessage();
 	$db->rollBack();
-	$db = null;
+	unset($db);
 	exit;
 }
 
@@ -484,7 +489,5 @@ if( $conf->multiserver )
 }
 
 echo $str;
-
-
-$db = null;
+unset($db);
 exit;

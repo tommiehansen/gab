@@ -14,14 +14,14 @@
 
 	# new instance
 	$gab = new \GAB\core($conf);
-?>
-<?php
-
 
     # 'global' params
     $setup = (object) [];
     $setup->limit = _G('limit') ? _G('limit') : 10;
     $setup->order = _G('order') ? _G('order') : 'strategy_profit';
+
+	# errors array (or false)
+	$errors = false;
 
 ?>
         <form action="view.php">
@@ -181,7 +181,7 @@
         $name = str_replace('.db','', $db);
         $q = explode('__', $name);
 
-        $db = new PDO('sqlite:' .  $conf->dirs->results . $db) or die('Error: Could not open database ' . $db);
+        $db = new PDO('sqlite:' .  $conf->dirs->results . $db) or $error[] = 'Could not open database ' . $db;
 
         $query = "
             SELECT * FROM results
@@ -195,30 +195,45 @@
 
         $db->beginTransaction();
 
-            $res = $db->query($query);
-            $res = $res->fetchAll(PDO::FETCH_ASSOC);
+			# results
+			$res = $db->query($query);
+			if( $res ){
+				$res = $res->fetchAll(PDO::FETCH_ASSOC);
+			}
+			else {
+				$errors[] = 'Could not fetch any results from the results table, maybe it\'s empty or not working.';
+				#prp( )
+			}
 
-            # total runs for entire exchange/pair
-            $total = $db->query($totalRuns);
-            $total_runs = $total->fetchAll()[0]['total'];
+			if( !$errors )
+			{
+	            # total runs for entire exchange/pair
+	            $total = $db->query($totalRuns);
+				if( $total ){
+					$total_runs = $total->fetchAll()[0]['total'];
+				}
+				else {
+					$errors[] = 'Could not fetch table runs from database';
+				}
+			}
 
         $db->commit();
+		$db=null;
 
-		$hasResults = true;
-		if( !isset($res[0]) )
+		if( $errors )
 		{
-			$hasResults = false;
-			echo "
-				<section>
-					<hr>
-					<h2>No results could be found</h2>
-				</section>
-			";
+			$str = '<section><hr><h2>Oh no, we got a problem!</h2>';
+			foreach( $errors as $error )
+			{
+				$str .= "<p><b>ERROR</b> $error</p>";
+			}
+			$str .= '</section>';
+			echo $str;
 		}
 
 ?>
 
-<?php if( $hasResults ) { ?>
+<?php if( !$errors ) { ?>
 
 		<?php
 
@@ -340,7 +355,7 @@
 ?>
 
 <?php
-    if( _G('db') && $hasResults ):
+    if( _G('db') && !$errors ):
 ?>
 
 <?php
