@@ -163,6 +163,8 @@ if( !file_exists($db_file) )
 		PRAGMA default_cache_size=10000
 		PRAGMA journal_size_limit=67110000
 	");
+	
+	$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 	# create runs table
 	$sql = "
@@ -210,6 +212,8 @@ else {
 		PRAGMA default_cache_size=10000
 		PRAGMA journal_size_limit=67110000
 	");
+
+	$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 	$db->beginTransaction();
 		# check if id already exist
