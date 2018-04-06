@@ -156,9 +156,12 @@ if( !file_exists($db_file) )
 	# settings
 	$db->exec("
 		PRAGMA journal_mode=MEMORY;
-		PRAGMA temp_store=MEMORY;
-		PRAGMA auto_vacuum=OFF;
+		-- PRAGMA journal_mode=FILE
+		PRAGMA temp_store=MEMORY
+		PRAGMA count_changes=OFF
+		PRAGMA auto_vacuum=OFF
 		PRAGMA default_cache_size=10000
+		PRAGMA journal_size_limit=67110000
 	");
 
 	# create runs table
@@ -200,14 +203,18 @@ else {
 
 	$db->exec("
 		PRAGMA journal_mode=MEMORY;
-		PRAGMA temp_store=MEMORY;
-		PRAGMA auto_vacuum=OFF;
+		-- PRAGMA journal_mode=FILE
+		PRAGMA temp_store=MEMORY
+		PRAGMA count_changes=OFF
+		PRAGMA auto_vacuum=OFF
 		PRAGMA default_cache_size=10000
+		PRAGMA journal_size_limit=67110000
 	");
 
-	# check if id already exist
-	$q = $db->query("SELECT id FROM runs WHERE id = '$run_id'");
-
+	$db->beginTransaction();
+		# check if id already exist
+		$q = $db->query("SELECT id FROM runs WHERE id = '$run_id'");
+	$db->commit();
 
 	if( $q ){
 		$runs = $q->fetchAll();
@@ -217,7 +224,6 @@ else {
 		unset($db);
 		exit;
 	}
-
 
 	empty( $runs ) ? $hasRan = false : $hasRan = true;
 }
@@ -435,9 +441,9 @@ try {
 
 		/* EXECUTE */
 
-		$blobs->execute($blobs_arr);
-		$results->execute($results_arr);
 		$q->execute([$run_id, 'true']);
+		$results->execute($results_arr);
+		$blobs->execute($blobs_arr);
 
 	} // end profitStrategy > market
 	else {
