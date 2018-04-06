@@ -155,8 +155,8 @@ if( !file_exists($db_file) )
 
 	# settings
 	$db->exec("
-		PRAGMA journal_mode=MEMORY;
-		-- PRAGMA journal_mode=FILE
+		PRAGMA journal_mode=MEMORY
+		PRAGMA synchronous=FULL
 		PRAGMA temp_store=MEMORY
 		PRAGMA count_changes=OFF
 		PRAGMA auto_vacuum=OFF
@@ -204,8 +204,8 @@ else {
 	$db	= new PDO($dir) or die("Error creating database file");
 
 	$db->exec("
-		PRAGMA journal_mode=MEMORY;
-		-- PRAGMA journal_mode=FILE
+		PRAGMA journal_mode=MEMORY
+		PRAGMA synchronous=FULL
 		PRAGMA temp_store=MEMORY
 		PRAGMA count_changes=OFF
 		PRAGMA auto_vacuum=OFF
