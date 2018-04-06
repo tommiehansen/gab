@@ -47,9 +47,10 @@ BEAR_RSI_high = 40:60,5
 BEAR_RSI_low = 10:30,5
 ```
 
-The format is <FROM>:<TO>,<STEPPING>.
+The format is MIN:MAX,STEPPING.
 This means that e.g. `10:20,5` will generate the range: `10,15,20`
 The params are inclusive meaning that odd stepping e.g. `5:15,10` will become `5,10,15` - the first and last of range is always kept.
+Also note that negative values also need to follow MIN/MAX. This is wrong: `-5:-15,5`, this is right: `-15:-5,5`.
 
 
 #### Donate or coffee?
