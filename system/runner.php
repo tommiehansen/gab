@@ -163,7 +163,7 @@ if( !file_exists($db_file) )
 		PRAGMA default_cache_size=10000
 		PRAGMA journal_size_limit=67110000
 	");
-	
+
 	$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 	# create runs table
@@ -215,10 +215,18 @@ else {
 
 	$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-	$db->beginTransaction();
-		# check if id already exist
-		$q = $db->query("SELECT id FROM runs WHERE id = '$run_id'");
-	$db->commit();
+
+	try {
+		$db->beginTransaction();
+			# check if id already exist
+			$q = $db->query("SELECT id FROM runs WHERE id = '$run_id'");
+		$db->commit();
+	} catch (\Exception $e) {
+		echo $e->getMessage();
+		$db->rollBack();
+		unset($db);
+		exit;
+	}
 
 	if( $q ){
 		$runs = $q->fetchAll();
