@@ -148,9 +148,10 @@
 		$html = '';
 		$head = $res[0];
 		if($id) $id = " id='$id'";
-		$html .= "<table class='$class'$id><thead><tr>";
+		$html .= "<table class='$class'$id data-sortable><thead><tr>";
 		foreach($head as $k=>$v){
-		    $html .= "<th>$k</th>";
+			if( $k == '&nbsp;' ){ $html .= '<th data-sortable="false">'; }
+			else { $html .= "<th>$k</th>"; }
 		}
 		$html .= "</tr></thead><tbody>";
 

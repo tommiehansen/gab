@@ -448,7 +448,7 @@ pre {
 
 
 /* Sortable tables */
-.sortable {
+table[data-sortable] {
 
     th::selection { background:none; }
 
@@ -464,12 +464,13 @@ pre {
        color: transparent;
        content: " \025B8"
    }
-   th.dir-down::after {
+
+   th[data-sorted-direction="descending"]::after {
        color: inherit;
        content: " \025BE"
    }
 
-   th.dir-up::after {
+   th[data-sorted-direction="ascending"]::after {
        color: inherit;
        content: " \025B4"
    }

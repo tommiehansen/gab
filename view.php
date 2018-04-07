@@ -46,7 +46,7 @@
 	                    $size = filesize($conf->dirs->results . $dbs);
 	                    $list[$key]['name'] = $dbs;
 	                    $list[$key]['last_run'] = $time;
-	                    $list[$key]['filesize'] = sprintf("%4.2f MB", $size/1048576);
+	                    $list[$key]['filesize'] = sprintf("%4.2f", $size/1048576);
 	                }
 
 	                # fix keys
@@ -62,7 +62,7 @@
 
 	                #prp($list);
 
-	                $html = '<table class="colored striped sortable"><thead>';
+	                $html = '<table class="colored striped sortable" data-sortable><thead>';
 
 	                foreach( $list as $key => $dbs )
 	                {
@@ -118,8 +118,8 @@
 	                            <td>$from</td>
 	                            <td>$to</td>
 	                            <td>$strategy</td>
-	                            <td>
-	                                <i>$filesize</i>
+	                            <td data-value='$filesize'>
+	                                <i>$filesize MB</i>
 	                                <div class='right'>
 	                                    <a class='button button-outline small tip clean $cleanClass' data-tip='Cleans the results table and keeps 500 most profitable runs'>CLEAN</a>
 	                                    <a class='button button-outline small tip red remove' data-tip='Remove this result set'>R</a>
