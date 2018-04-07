@@ -154,14 +154,14 @@ class core {
 			if( is_array($val) ){
 				foreach( $val as $k => $v ){
 					$a = $v / $total;
-					 if( $rounding ) $a = (float) number_format($a, 3);
-					 $avg[$key][$k] = $a;
+					 if( $rounding ) $a = (float) $a;
+					 $avg[$key][$k] = (float) $a;
 				}
 			}
 			else {
 				$a = $val / $total;
-				if( $rounding ) $a = (float) number_format($a, 3);
-				$avg[$key] = $a;
+				if( $rounding ) $a = (float) $a;
+				$avg[$key] = (float) $a;
 			}
 		} // foreach()
 
