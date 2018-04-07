@@ -13,7 +13,7 @@ datasets.on('keyup', '#filter', gab.debounce(function(){
     gab.filter_table(this, trs);
 }, 100));
 
-datasets.on('click', 'tr', function(){
+ds.on('click', 'tr', function(){
     gab.tr_check($(this));
 })
 
