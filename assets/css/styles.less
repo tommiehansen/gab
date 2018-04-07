@@ -90,6 +90,30 @@ td input[type=radio]{
     display: inline-block;
 }
 
+.colored th.exit {
+    background-color: @color-secondary;
+}
+
+.colored th {
+    border-color: @color-primary-white;
+
+    &:first-child {
+        border-top-left-radius: @border-radius;
+    }
+    &:last-child {
+        border-top-right-radius: @border-radius;
+    }
+    &[data-sorted="true"]{
+        background-color: @pink-300;
+    }
+}
+
+.floatThead-container {
+    transition: transform .2s ease;
+    z-index:1 !important;
+    pointer-events: none;
+}
+
 
 /* navbar */
 body { padding-top: @spacing-double*2; }

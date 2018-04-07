@@ -91,11 +91,20 @@
 	    $b = new \DateTime("@$str");
 
 		$diff = $a->diff($b);
+		#prp($diff);
 		if( $diff->days > 0 ){
 			return $diff->format('%ad, %hh');
 		}
+		else if( $diff->h < 1 ){
+			return $diff->format('%im');
+		}
 		else {
-			return $diff->format('%hh');
+			if( $diff->i > 0 ){
+				return $diff->format('%hh, %im');
+			}
+			else {
+				return $diff->format('%hh');
+			}
 		}
 	}
 

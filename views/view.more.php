@@ -102,7 +102,7 @@
     echo "
         <hr>
         <h4 id='more_data'>Data</h4>
-        <table>
+        <table class='colored striped'>
         <thead>
             <th>Name</th>
             <th>Description</th>
@@ -191,15 +191,21 @@
     {
         if( $key === 0 ){
             echo "
-                <table class='tbl striped' style='transform: translateZ(0)'>
+                <table id='roundtrips_table' class='tbl colored striped sticky' style='transform: translateZ(0)' data-sortable>
                 <thead>
                     <tr>
             ";
             foreach( $arr as $k => $v ){
                 if( $k == 'pnl' ) continue;
+                $color = '';
+                if( contains('exit', $k) ) $color = 'exit';
                 if( $k == 'entryAt' ) $k = 'Entry';
                 if( $k == 'exitAt' ) $k = 'Exit';
-                echo "<th>$k</th>";
+                if($k == 'entryPrice') $k = 'Price';
+                if( $k == 'entryBalance' ) $k = 'Balance';
+                if( $k == 'exitPrice' ) $k = 'Price';
+                if( $k == 'exitBalance' ) $k = 'Balance';
+                echo "<th class='$color'>$k</th>";
             }
             echo "
                 </tr>
@@ -210,8 +216,9 @@
 
         echo "<tr>";
         foreach( $arr as $k => $v ){
+            $orig = $v;
             if( $k == 'pnl' ) continue;
-            if( contains('00Z', $v) ) $v = substr(tdate($v), 0, 16);
+            if( contains('00Z', $v) ) { $v = substr(tdate($v), 0, 16); }
             if( $k == 'duration' ) $v = secondsToHuman($v/1000);
             if( is_numeric($v) ) $v = number_format($v, 2);
             if( $k == 'profit' ) {
@@ -222,7 +229,7 @@
                     $v = '<span class="positive">' . $v . '%</span>';
                 }
             }
-            echo "<td>$v</td>";
+            echo "<td data-value='$orig'>$v</td>";
         }
         echo "</tr>";
     }
@@ -230,10 +237,19 @@
     echo "</tbody></table>";
 
 ?>
-
-
 </section>
 
+<script>
+window.onload = function(){
+    let src = "<?php echo $conf->urls->assets; ?>floatThead.js";
+    $.getScript(src, function(){
+        $('#roundtrips_table').floatThead({
+            position: 'absolute',
+            top: 80
+        });
+    })
+}
+</script>
 
 <?php
     require 'footer.php';
