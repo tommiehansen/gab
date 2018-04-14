@@ -6,6 +6,10 @@ Gekko Automated Backtests
 If something does not work, it simply does not work since time hasn't existed yet to get it working.
 
 ###### Breaking changes
+14/4 2018
+Added MySQL (InnoDB) option but this also forced a new format to be used.
+A conversion tool for old SQLite db's is included under the new /tools/ -folder. Goto <your install>/tools/ and run it if you would like to convert your old data to the new database format. For massive runs it is also recommended to use the new MySQL option.
+
 26/3 2018
 Cleaned up most stuff and optimized many more + added a lot of things 'under the hood'. A lot of changes and changes to things such as the databases etc. This make this a version _incompatible_ with the prior (first released) version.
 
