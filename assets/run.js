@@ -226,8 +226,9 @@ f.on('submit', function(e){
     e.preventDefault();
 
     // VARs
-    var serialized = $(this).serialize(),
-        form_url = $(this).prop('action'),
+    var $t = $(this),
+        serialized = $t.find('input,textarea,select').not('.hidden').serialize(), // exclude hidden inputs from POST
+        form_url = $t.prop('action'),
         timeout = $('#ajax_timeout')[0].value * 60000,
         noResultRuns = 0, // reset
         threads = f.find('#threads')[0].value,
