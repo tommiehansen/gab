@@ -44,6 +44,7 @@
 					/* normalize format between SQLite/MySQL */
 					if( $isMySQL )
 					{
+						# MySQL 5.6+
 						$sql = "
 							SELECT
 								a.table_schema as name,
@@ -70,7 +71,29 @@
 						";
 
 						$files = $db->query($sql);
-						$files = $files->fetchAll(PDO::FETCH_ASSOC);
+						if( $files ) {
+							$files = $files->fetchAll(PDO::FETCH_ASSOC);
+							$oldMySQL = false;
+						}
+						// old MySQL-versions without InnoDB tables
+						else {
+							echo '<p><b>Warning!</b> You are using an old version of MySQL, please upgrade to 5.6+ that came out in 2013...</p>';
+							$oldMySQL = true;
+							$sql = "
+								SELECT
+								a.table_schema as name,
+								SUM(round(((a.data_length + a.index_length) / 1024 / 1024)))  AS 'size_mb'
+
+								FROM information_schema.tables a
+
+								WHERE a.table_schema LIKE '%$%'
+								GROUP BY a.table_schema
+							";
+							$files = $db->query($sql);
+							$files = $files->fetchAll(PDO::FETCH_ASSOC);
+							foreach( $files as $k => $v ){ $files[$k]['last_change'] = '1982-02-08 01:00:00'; } // set fake date
+						}
+
 						foreach( $files as $k => $v ){ $files[$k]['name'] .= '.db'; } // normalize to '.db'
 					}
 					else {
