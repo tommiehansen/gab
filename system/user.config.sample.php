@@ -20,6 +20,23 @@ $server = 'http://localhost:3000';
 
 
 /*
+    *** DATABASE SETTINGS ***
+    default: sqlite
+
+    If you want to use another db engine set
+    it here. Using MySQL is more stable then
+    SQLite so if you plan to do massive runs
+    with over 10k+ results or plan to do heavy
+    multithreading do switch to MySQL.
+
+    Choices are 'sqlite' --OR-- 'server,user,pass'
+    Example for mysql: '127.0.0.1:3306,TommieHansenIsTheBest,MySuperPassword'
+*/
+
+$db_engine = 'sqlite';
+
+
+/*
     *** TIMEOUT SETTINGS ***
     default: 600 (10 minutes)
 
@@ -76,4 +93,5 @@ $allow_origin = false;
     $server = 'http://localhost:3000';
     define('SERVER_TIMEOUT', 900);
     $allow_origin = false;
+    $db_engine = 'sqlite'
 */

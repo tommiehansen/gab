@@ -15,6 +15,10 @@
     require 'header.php';
 
     $gab = new GAB\core($conf);
+
+    # get / check db type
+	$dbc = $conf->db;
+	$dbc->host == 'sqlite' ? $isMySQL = false : $isMySQL = true;
 ?>
 
 
@@ -22,14 +26,23 @@
 <h3>Run id <?= $id ?></h3>
 <p><?= $db ?></p>
 
-<a href="#more_data" class="button">Data</a>
-<a href="#more_strategy" class="button">Strategy params</a>
-<a href="#more_roundtrips" class="button">Roundtrips</a>
+<div id="scrollButtons">
+    <a href="#more_data" class="button">Data</a>
+    <a href="#more_strategy" class="button">Strategy params</a>
+    <a href="#more_roundtrips" class="button">Roundtrips</a>
+</div>
 
 <?php
 
-    /* get data */
-    $db = new PDO('sqlite:' .  $conf->dirs->results . $db) or die('Error @ db');
+    if( $isMySQL )
+    {
+        $dbName = str_replace('.db', '', $db);
+        $con = "mysql:host=".$dbc->host.";dbname=$dbName;charset=utf8mb4";
+        $db = new PDO($con, $dbc->user, $dbc->pass) or die("Error connecting to MySQL");
+    }
+    else {
+        $db = new PDO('sqlite:' .  $conf->dirs->results . $db) or die('Error @ db');
+    }
 
     $sql = "
         SELECT * FROM results a
@@ -196,7 +209,7 @@
                     <tr>
             ";
             foreach( $arr as $k => $v ){
-                if( $k == 'pnl' ) continue;
+                if( $k == 'id' || $k == 'pnl' ) continue;
                 $color = '';
                 if( contains('exit', $k) ) $color = 'exit';
                 if( $k == 'entryAt' ) $k = 'Entry';
@@ -217,7 +230,7 @@
         echo "<tr>";
         foreach( $arr as $k => $v ){
             $orig = $v;
-            if( $k == 'pnl' ) continue;
+            if( $k == 'id' || $k == 'pnl' ) continue;
             if( contains('00Z', $v) ) { $v = substr(tdate($v), 0, 16); }
             if( $k == 'duration' ) $v = secondsToHuman($v/1000);
             if( is_numeric($v) ) $v = number_format($v, 2);
@@ -247,6 +260,14 @@ window.onload = function(){
             position: 'absolute',
             top: 80
         });
+    })
+
+    $('#scrollButtons').on('click', 'a', function(e){
+        e.preventDefault();
+        var target = this.hash;
+		$('html, body').animate({
+			scrollTop: $(target).offset().top-100
+		}, 500);
     })
 }
 </script>

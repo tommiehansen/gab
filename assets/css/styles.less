@@ -81,6 +81,10 @@ table tbody tr.checked td {
     background: @color-primary-white !important;
 }
 
+table.striped tbody tr.checked:nth-child(2n+2) td {
+    background: aliceblue !important;
+}
+
 table { cursor: default; }
 
 td input[type=radio]{
@@ -117,6 +121,7 @@ td input[type=radio]{
 
 /* navbar */
 body { padding-top: @spacing-double*2; }
+
 #nav {
     position: fixed; top: 0; left: 0;
     z-index: 2;
@@ -254,6 +259,13 @@ body { padding-top: @spacing-double*2; }
 
     &.out #goup { visibility:visible; transform:none; z-index: 1; opacity: 1; }
 
+}
+
+// night modification
+.night #nav {
+    background: linear-gradient(to right, @purple-600, @indigo-800);
+    .logo { color: @purple-A100; }
+    #goup { border-bottom-color: @indigo-800; }
 }
 
 @keyframes logo {

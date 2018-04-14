@@ -9,6 +9,7 @@ class core {
 		$this->conf = $conf;
 		$this->endpoints = $conf->endpoints;
 		$this->cache = $conf->cache;
+		$this->cache_dir = $conf->dirs->cache;
 
 		# requires
 		require_once $conf->dirs->system . 'functions.php';
@@ -53,7 +54,6 @@ class core {
 	# returns array of strategies and meta
 	public function get_strategies( $parse = true )
 	{
-
 		$strats = $this->get( $this->endpoints->strategies, 'strategies.cache' );
 
 		$new = [];
@@ -338,7 +338,7 @@ class core {
 	private function get( $url, $file )
 	{
 		$cacheTime = $this->cache->cacheTime;
-		$file = $this->cache->cache_dir . $file;
+		$file = $this->cache_dir . $file;
 		$curl = curl_cache($url, $file, $cacheTime);
 		return json_decode($curl, true);
 	}
@@ -347,7 +347,7 @@ class core {
 	private function post( $url, $file, $vars )
 	{
 		$cacheTime = $this->cache->cacheTime;
-		$file = $this->cache->cache_dir . $file;
+		$file = $this->cache_dir . $file;
 		return curl_post_cache( $url, $vars, $file, $cacheTime );
 	}
 

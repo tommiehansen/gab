@@ -13,6 +13,9 @@ require_once 'conf.php';
 require_once $conf->dirs->system . 'functions.php';
 require_once $conf->dirs->system . 'class.gab.php';
 
+# gz compression level for blob data
+$gz_level = 8;
+
 $gab = new \GAB\core($conf);
 
 #prph('POST');
@@ -57,8 +60,8 @@ date_default_timezone_set('UTC');
 // we're sending data in Y-m-d 00:00:00 format so need to convert
 $jsFrom = date('Y-m-d\TH:i:s\Z', strtotime($settings->from));
 $jsTo = date('Y-m-d\TH:i:s\Z', strtotime($settings->to));
-$dbFrom = date('Y-m-d', strtotime($settings->from));
-$dbTo = date('Y-m-d', strtotime($settings->to));
+$dbFrom = date('ymd', strtotime($settings->from));
+$dbTo = date('ymd', strtotime($settings->to));
 
 $settings = [
 	'candle_size' => (int) $candle_size,
@@ -133,45 +136,71 @@ $run_id = $str;
 
 ----------------------------------------- */
 
-# create name for db [exchange_asset]
+# create db filename / table name
 $fromTo = $dbFrom . '--' . $dbTo; // add dateRange (simple)
-$file = $settings['exchange'] . '__' . $settings['asset'] . '__' . $settings['currency'] . '__' . $fromTo . '__' . $strat_name;
-$file .= '.db';
-#prp($file); exit;
+$sep = '$';
+$file = $settings['exchange'] . $sep . $settings['asset'] . $sep . $settings['currency'] . $sep . $fromTo . $sep . $strat_name;
 
 
 # fields
 $blobs_fields = (array) $conf->db_fields->blobs;
 $results_fields = (array) $conf->db_fields->results;
 
-# database setup
-$db_file = $conf->dirs->results . $file;
+/* sqlite or mysql */
+$dbc = $conf->db;
+$dbc->host == 'sqlite' ? $isMySQL = false : $isMySQL = true;
 
-# check if file already exists and don't repeat queries ...
-if( !file_exists($db_file) )
+# mysql
+if( $isMySQL )
 {
-	$dir = "sqlite:" . $db_file;
-	$db	= new PDO($dir) or die("Error creating database file"); // creates the file
+	#$file .= '_db'; // name for mysql cannot contain '.'
+	$con = "mysql:host=".$dbc->host.";charset=utf8mb4";
+	$db = new PDO($con, $dbc->user, $dbc->pass) or die("Error connecting to MySQL");
+}
+# sqlite
+else {
+	$file .= '.db'; // add .db to name
+	$db_file = $conf->dirs->results . $file;
 
-	# settings
+	$dir = "sqlite:" . $db_file;
+	$db	= new PDO($dir) or die("Error creating SQLite database file");
+
 	$db->exec("
-		PRAGMA journal_mode=MEMORY;
-		-- PRAGMA journal_mode=FILE
+		PRAGMA journal_mode=MEMORY
 		PRAGMA temp_store=MEMORY
 		PRAGMA count_changes=OFF
 		PRAGMA auto_vacuum=OFF
 		PRAGMA default_cache_size=10000
 		PRAGMA journal_size_limit=67110000
 	");
+}
 
-	$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+#$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+$db->beginTransaction();
+
+	if( $isMySQL )
+	{
+		// must create database if not exist
+		$db->query("CREATE DATABASE IF NOT EXISTS `$file`");
+		$db->query("USE `$file`");
+	}
 
 	# create runs table
 	$sql = "
-	CREATE TABLE IF NOT EXISTS runs (
-		id TEXT PRIMARY KEY UNIQUE,
-		success TEXT
+		CREATE TABLE IF NOT EXISTS `runs` (
+		`id` TEXT PRIMARY KEY UNIQUE,
+		`success` TEXT
 	)";
+
+	if( $isMySQL ){
+		$sql = "
+			CREATE TABLE IF NOT EXISTS `runs` (
+			`id` VARCHAR(100) PRIMARY KEY UNIQUE,
+			`success` TINYTEXT
+		)";
+		$sql .= " ENGINE=InnoDB";
+	}
 
 	$db->query($sql);
 
@@ -183,6 +212,15 @@ if( !file_exists($db_file) )
 
 	foreach( $results_fields as $key => $val ){ $sql .= "`$key` $val, "; }
 	$sql = rtrim($sql, ', '); $sql .= ")";
+	if( $isMySQL ) {
+		#$sql = str_replace('`strategy_profit` INTEGER','`strategy_profit` VARCHAR(100)', $sql);
+		#$sql = str_replace('`market_profit` INTEGER','`market_profit` VARCHAR(100)', $sql);
+		$sql = str_replace('`strategy_profit` INTEGER','`strategy_profit` BIGINT', $sql);
+		$sql = str_replace('`alpha` INTEGER','`alpha` BIGINT', $sql);
+		$sql = str_replace(['INTEGER','BLOB','REAL'],['INT','LONGBLOB','FLOAT'], $sql);
+		$sql = str_replace('`id` TEXT','`id` VARCHAR(100)', $sql);
+		$sql .= " ENGINE=InnoDB";
+	}
 	$db->query($sql);
 
 	# create blobs table
@@ -192,53 +230,41 @@ if( !file_exists($db_file) )
 
 	foreach( $blobs_fields as $key => $val ){ $sql .= "`$key` $val, "; }
 	$sql = rtrim($sql, ', '); $sql .= ")";
+	if( $isMySQL ) {
+		$sql = str_replace(['INTEGER','BLOB','REAL'],['INT','LONGBLOB','FLOAT'], $sql);
+		$sql = str_replace('`id` TEXT','`id` VARCHAR(100)', $sql);
+		$sql .= " ENGINE=InnoDB";
+	}
 	$db->query($sql);
 
 	# set hasRan to false (since no runs...)
 	$hasRan = false;
 
-} // if !file_exists
-// so file does exist...
-else {
-	$dir = "sqlite:" . $db_file;
-	$db	= new PDO($dir) or die("Error creating database file");
-
-	$db->exec("
-		PRAGMA journal_mode=MEMORY;
-		-- PRAGMA journal_mode=FILE
-		PRAGMA temp_store=MEMORY
-		PRAGMA count_changes=OFF
-		PRAGMA auto_vacuum=OFF
-		PRAGMA default_cache_size=10000
-		PRAGMA journal_size_limit=67110000
-	");
-
-	$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$db->commit();
 
 
-	try {
-		$db->beginTransaction();
-			# check if id already exist
-			$q = $db->query("SELECT id FROM runs WHERE id = '$run_id'");
-		$db->commit();
-	} catch (\Exception $e) {
-		echo $e->getMessage();
-		$db->rollBack();
-		unset($db);
-		exit;
-	}
-
-	if( $q ){
-		$runs = $q->fetchAll();
-	}
-	else {
-		echo "<u class='notice'>Notice: Could not fetch run_id so skipping...</u>";
-		unset($db);
-		exit;
-	}
-
-	empty( $runs ) ? $hasRan = false : $hasRan = true;
+try {
+	$db->beginTransaction();
+		# check if id already exist
+		$q = $db->query("SELECT id FROM runs WHERE id = '$run_id'");
+	$db->commit();
+} catch (\Exception $e) {
+	echo $e->getMessage();
+	$db->rollBack();
+	unset($db);
+	exit;
 }
+
+if( $q ){
+	$runs = $q->fetchAll();
+}
+else {
+	echo "<u class='notice'>Notice: Could not fetch run_id so skipping...</u>";
+	unset($db);
+	exit;
+}
+
+empty( $runs ) ? $hasRan = false : $hasRan = true;
 
 
 if( $hasRan )
@@ -296,7 +322,7 @@ try {
 		$sharpe = number_format($r->sharpe, 2);
 		$numTrades = $r->trades; // note, 1x roundtrip = 1x buy + 1x sell
 		$numRoundtrips = count($get->roundtrips);
-		$alpha = number_format($r->alpha);
+		$alpha = round($r->alpha);
 		$exchange = $settings['exchange'];
 
 		/* loop and add trading data from roundtrips */
@@ -402,13 +428,13 @@ try {
 			$t->best,
 			$t->worst,
 			$t->per_day,
-			gzencode(json_encode($strat, true)),
+			gzencode(json_encode($strat, true), $gz_level),
 		];
 
 
 		// add
-		$report_blob = gzencode(json_encode($report));
-		$roundtrips_blob = gzencode(json_encode($get->roundtrips));
+		$report_blob = gzencode(json_encode($report), $gz_level);
+		$roundtrips_blob = gzencode(json_encode($get->roundtrips), $gz_level);
 
 		$blobs_arr = [
 			$run_id,

@@ -3,13 +3,38 @@
 require_once 'conf.php';
 require_once $conf->dirs->system . 'functions.php';
 
+# kill if bad id
+if( !_G('id') ) die('E.');
 $id = _G('id');
+if( !$id && !contains('.db') ) die('E.');
 
-if( $id && contains('.db', $id))
+$file = $id;
+
+# get / check db type
+$dbc = $conf->db;
+$dbc->host == 'sqlite' ? $isMySQL = false : $isMySQL = true;
+
+/* MySQL */
+if( $isMySQL )
 {
+    # remove .db extension
+    $file = str_replace('.db','', $file);
+    prp( $file );
 
-    $file = $id;
+    $con = "mysql:host=".$dbc->host.";charset=utf8mb4";
+    $db = new PDO($con, $dbc->user, $dbc->pass) or die("Error connecting to MySQL");
 
+    $sql = "
+        DROP DATABASE `$file`
+    ";
+
+    $db->query($sql);
+    $db=null;
+    exit;
+}
+/* SQLite */
+else
+{
     # replace odd chars
     $file = str_replace('%','', $file);
     $file = str_replace("'",'', $file);
@@ -26,10 +51,6 @@ if( $id && contains('.db', $id))
 
     # remove
     unlink($db_src);
-
-}
-
-else {
-    http_response_code(403);
-    die();
+    $db=null;
+    exit;
 }

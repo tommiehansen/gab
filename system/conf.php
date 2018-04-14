@@ -19,19 +19,34 @@
 		/* load user config */
 		require_once $system_path . 'user.config.php';
 
+
 		/* general conf */
 		# force allow origin * (for more threads)
 		if( $allow_origin ){ $conf['allow_origin'] = true; }
 		else { $conf['allow_origin'] = false; }
 
-		# cache
+		/* database */
+		if(!isset($db_engine)) $db_engine = 'sqlite';
+		$conf['db']['host'] = 'sqlite'; // set default
+		if( $db_engine !== 'sqlite' )
+		{
+			$cred = explode(',', $db_engine);
+			$conf['db'] = [
+				'db_name' => 'gabby',
+				'host' => $cred[0],
+				'user' => $cred[1],
+				'pass' => $cred[2],
+			];
+		}
+
+		/* cache */
 		$conf['cache'] = [
 			'cache_dir' => 'cache/',
 			'caching' => true,
 			'cacheTime' => '6 hours',
 		];
 
-		# multi-server -- set first as primary
+		/* multi-server -- set first as primary */
 		$multiServer = false;
 
 		if( is_array( $server )){
@@ -130,14 +145,6 @@
 		// turn to object
 		$conf = json_decode(json_encode($conf));
 
-		# DEBUG
-		#include_once 'functions.php';
-		#prp($domain);
-		#prp($docRoot);
-		#prp($base_url);
-		#prp($conf);
-		#exit;
-
 		/* set large defaults for PHP */
 		error_reporting(E_ALL);
 		ini_set('display_errors', 1);
@@ -206,7 +213,7 @@
 						<li>Modify it to suit your needs and rename it to <b>system/user.config.php</b></li>
 						<li>See if it bloody works</li>
 					</ol>
-					<p>You can also perform a simple compatibility check by visiting <a href='sanitycheck.php'>sanitycheck.php</a></p>
+					<p>You can also perform a simple compatibility check by visiting <a href='tools/sanitycheck.php'>sanitycheck.php</a></p>
 				</section>
 			</div>
 		";

@@ -250,8 +250,6 @@ f.on('submit', function(e){
         sub[0].value = 'RUN IT!';
         sub.removeClass('on');
         stopAll = false;
-        talk.cancel(); // kill all speech
-        talk.say('Stopping running instances.');
         runCount = 0; // reset
         noResultRuns = 0; // reset
         elapsedTime = 0;
@@ -280,12 +278,6 @@ f.on('submit', function(e){
         let strat_orig = strat;
         $('#log_status').text("Running with " + threads + ' threads');
         $('#logs').removeClass('hidden').html('<u class="info">INFO</u> <u class="success">Running strategy: '+ strat_orig +', please stand by...</u>');
-
-        // say stuff
-        strat = strat.replace(/_/g,'. ');
-        strat = strat.replace(/-/g,'. ');
-        talk.cancel();
-        talk.say('Running strategy: '+ strat +'. Using ' + threads + ' threads, please stand by.');
 
         // start interval
         intervalCounter = setInterval(function(){

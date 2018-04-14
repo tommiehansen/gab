@@ -2,7 +2,8 @@
 clear
 
 file=$@
-set -a
+set -a # export var's
+#set +m # silence background jobs (curl)
 
 # check if settings.sh exists
 if [ ! -f $file ]; then
@@ -20,21 +21,8 @@ then
 return
 fi
 
-# check if gnu paralell is installed
-#command -v paralell >/dev/null 2>&1 || { echo "I require gnu paralell but it's not installed.  Try installing via apt-get paralell or similar package manager." >&2; }
 
 
-# ask user for number of threads
-THREADS=1
-#echo -n "How many threads? [1-99]: "
-#read THREADS
-if [[ $THREADS -lt 1 || $THREADS -gt 99 ]]
-    then
-        echo "Bad number of threads, idiot."
-        return
-else
-    clear
-fi
 
 
 # import user settings
@@ -97,37 +85,16 @@ MAX_NO_RESULTS=200 # TODO ... Need a way to kill everything if NO_RESULTS_RUN > 
 
 runforever()
 {
-    let "COUNTER++"
-    #echo $COUNTER;
-    date=`date '+%H:%M:%S'`
-    printf "${cyan}${date}:${end} ${mag}In progress...${end}"
-
-    timer_start=$(date +%s)
-
-    # curl
-    #curl -X POST --data "$(generate_post_data)" $SRC
-    get=$(curl -s -X POST --data "$(generate_post_data)" $SRC)
-    timer_end=$(date +%s)
-    diff=$(($timer_end - $timer_start))
-
-    # TODO
-    #if [[ diff < 3 ]]; then
-    #    let "MAX_COUNTER++"
-    #else
-    #    MAX_COUNTER=0 # reset
-    #fi
-    printf "\r";
-    date=`date '+%H:%M:%S'`
-    printf "${yel}${date}:${end} "
-    ELAPSED="Duration: $(($SECONDS / 3600))h $((($SECONDS / 60) % 60))m"
-    EXEC_TIME="$((($diff / 60) % 60))m $(($diff % 60))s"
-    STATUS=" [ Exec: $EXEC_TIME / $ELAPSED / Total runs: ${COUNTER} ]"
-    mod="${get/Bad!/${red}BAD!${end}}"
-    mod="${mod/Success!/${grn}SUCCESS!${end}}"
-    echo $mod.$STATUS
-    #echo " MAX: $MAX_COUNTER "
-
-    # run again
+    i="0"
+    while [ $i -lt $THREADS ]
+    do
+        let "COUNTER++"
+        let "i++"
+       (
+          ./curl.sh "$(generate_post_data)" $SRC $COUNTER # outputs background job messages for no reason, need to silence
+       ) &
+    done
+    wait
     runforever
 }
 
@@ -141,7 +108,7 @@ printf "${yel}${line}${end}\n"
 # display threads
 info="${cyn}INFO${end} >"
 set="${yel}SETTINGS${end} >"
-printf "$info Running $STRATEGY using $THREADS thread(s) \n"
+printf "$info Running $STRATEGY \n"
 printf "$info To quit hold CTRL+C \n\n"
 printf "$set \n"
 printf "    $asset / $currency @ $exchange \n"
@@ -149,6 +116,17 @@ printf "    Candle: ${candle_size} min  History: $history_size \n"
 printf "\n";
 
 
+# ask user for number of threads
+THREADS=1
+echo -n "How many threads? [1-99]: "
+read THREADS
+if [[ $THREADS -lt 1 || $THREADS -gt 99 ]]
+    then
+		echo "Bad number of threads, idiot."
+		return
+fi
+
+# display stupid text
 arr[0]=" you bloody idiot."
 arr[1]=" and let's have a nice day?"
 arr[2]=" ... hopefully it will turn out well."
@@ -159,55 +137,8 @@ arr[6]=" and while it runs let's spam Tommie Hansen with random questions."
 
 rand=$(( RANDOM % 7 ))
 
-printf "Let's go${arr[$rand]} \n\n"
+printf "\nLet's go${arr[$rand]} \n\n"
 
-# run forever with X threads
-#export -f runforever
-#export -f generate_post_data
-
-#xargs -P 10 -n 10 -I{} bash -c runforever
-#xargs -P $THREADS -n 2 -I{} bash -c echo runforever
-#xargs -n 1 -P 5 -I{} bash -c runforever {}
-#xargs -P 4 -n 1 'runforever'
-
-#xargs -n1 -P3 -i bash -c "-a $(declare -f) ; runforever {}"
-#xargs -n1 -P2 -i bash -c "runforever {}"
-#xargs -n 1 -P 2 -i bash -c $(runforever)
-
-#xargs -n3 -P3 -i bash -c $(runforever)
-#xargs -n5 -P5 -i bash printf $(runforever)
-#xargs -0 -I {} -P 4 $(runforever)
 
 # init
 runforever
-
-# run forever with X threads
-#export -f runforever
-#export -f generate_post_data
-
-#xargs -P 10 -n 10 -I{} bash -c runforever
-#xargs -P $THREADS -n 2 -I{} bash -c echo runforever
-#xargs -n 1 -P 5 -I{} bash -c runforever {}
-#xargs -P 4 -n 1 'runforever'
-
-#xargs -n1 -P3 -i bash -c "-a $(declare -f) ; runforever {}"
-#xargs -n1 -P2 -i bash -c "runforever {}"
-#xargs -n 1 -P 2 -i bash -c $(runforever)
-
-#xargs -n3 -P3 -i bash -c $(runforever)
-#xargs -n5 -P5 -i bash printf $(runforever)
-#xargs -0 -I {} -P 4 $(runforever)
-#Q=5
-#parallel -j $Q ::: runforever
-#parallel -j 10 ::: runforever
-#make -R n -j $Q runforever
-#parallel -P $Q ::: runforever
-
-# WORKS!
-#parallel ::: runforever runforever runforever
-
-# init
-#runforever & printf "\n" &
-#runforever & printf "\n" &
-#runforever
-#wait
