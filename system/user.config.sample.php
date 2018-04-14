@@ -9,7 +9,9 @@
 
 /*
     *** SERVER SETTINGS ***
-    default: http://localhost:3000/api/
+    default: http://localhost:3000
+
+    This should point to your running Gekko server.
 
     This variable can either be one server e.g:
     $server = 'http://myserver.com:3000'
