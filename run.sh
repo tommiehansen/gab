@@ -4,7 +4,6 @@ clear
 file=$1
 set -a
 
-
 # check if settings.sh exists
 if [ ! -f $file ]; then
     echo " ERROR!"
