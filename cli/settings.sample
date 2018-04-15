@@ -40,8 +40,10 @@ currency="USDT"
 asset="ETC"
 history_size="10"
 
-# dates, use Y-m-d format e.g. 2018-12-24 or Y-m-dT23:00:00:00Z e.g. 2018-12-24T23:30:00:00Z if nerding out
-# NOTE: Changing date from/to *WILL* create a new database for that daterange
+# dates, use Y-m-d format e.g. 2018-12-24 or 2018-12-24 22:45.
+# NOTE: If you use e.g. 2018-12-24 and get a lot of errors this mean
+# that Gekko cannot determine the daterange and thus you need to add
+# timestamp e.g. 22:45, get this value by checking your data.
 # NOTE: You need to check your dataset(s) to get these values
-from="2017-12-01"
-to="2018-02-01"
+from="2017-12-01 10:00"
+to="2018-02-01 10:00"
