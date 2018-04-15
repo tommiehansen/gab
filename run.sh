@@ -130,7 +130,7 @@ arr[3]=" you piece of s*** garbabe w***!"
 arr[4]="! Maybe drink some coffee and go watch the sun?"
 arr[5]="! This is a great time to go do other things."
 arr[6]=" and while it runs let's spam Tommie Hansen with random questions."
-arr[7]=" Lambo generator started."
+arr[7]="! Lambo generator started."
 
 rand=$(( RANDOM % 8 ))
 
