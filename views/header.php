@@ -5,7 +5,7 @@
     }
 
     $page_title = 'GAB: ' . $page_title;
-    $asset_version = date('ymd');
+    $asset_version = date('ymd') . '_v0';
 
     // get day/night
     $now = date('G');

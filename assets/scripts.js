@@ -162,8 +162,6 @@ var gab = {
 		el.parent().find('.checked').removeClass('checked');
 		el.addClass('checked');
 
-
-
 		// check if page = run (index)
 		if( this.currentPage == 'index' )
 		{

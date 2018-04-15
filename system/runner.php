@@ -57,7 +57,7 @@ foreach($strat_post as $key => $val ){
 # NOTE: Gekko doesn't seem to accept date format ?!, needsfix
 date_default_timezone_set('UTC');
 
-// we're sending data in Y-m-d 00:00:00 format so need to convert
+// convert to valid formats
 $jsFrom = date('Y-m-d\TH:i:s\Z', strtotime($settings->from));
 $jsTo = date('Y-m-d\TH:i:s\Z', strtotime($settings->to));
 $dbFrom = date('ymd', strtotime($settings->from));
