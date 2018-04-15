@@ -320,6 +320,11 @@
         $db->commit();
 		$db=null;
 
+		# check if there are profitable results
+		if( !isset($res[0]) || !isset($res[0]['market_profit'])  ){
+			$errors[] = 'You do not have any profitable runs to show, maybe run your strategy a little more to get some?';
+		}
+
 		if( $errors )
 		{
 			$str = '<section><hr><h2>Oh no, we got a problem!</h2>';
