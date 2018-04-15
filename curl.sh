@@ -8,14 +8,14 @@ mag=$'\e[1;35m'
 cyn=$'\e[1;36m'
 end=$'\e[0m'
 
+COUNTER=$(expr $3 + $4)
+
 SECONDS=0
 TIMER=0
 date=`date '+%H:%M:%S'`
-#printf "${cyan}${date}:${end} ${mag}In progress, run ${3}...${end}\n"
+
 timer_start=$(date +%s)
-#echo "curl -s -X POST --data \"$1\" $2"
 get=$(curl -s -X POST --data "$1" $2);
-#echo $get
 timer_end=$(date +%s)
 diff=$(($timer_end - $timer_start))
 printf "\r"
