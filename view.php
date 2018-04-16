@@ -203,7 +203,7 @@
 	                    $date = $dbs['date'];
 	                    $input = "<input name='db' value='$db_name' type='radio' $c>";
 	                    $cleanClass = $filesize > 100 ? 'red' : '';
-						$isMySQL ? $cleanLimit = '1000 with best sharpe and the 1000' : $cleanLimit = 500;
+						$isMySQL ? $cleanLimit = '500 with best sharpe and the 500' : $cleanLimit = 500;
 	                    $html .= "
 	                        <tr class='$c' rel='$dbsFile'>
 	                            <td>$input $exchange</td>

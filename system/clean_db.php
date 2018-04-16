@@ -31,14 +31,14 @@ if( $isMySQL )
         	SELECT id FROM (
         		SELECT id FROM results
         		ORDER BY strategy_profit DESC
-        		LIMIT 1000
+        		LIMIT 500
         	) foo
         )
         AND id NOT IN (
         	SELECT id FROM (
         		SELECT id FROM results
         		ORDER BY sharpe DESC
-        		LIMIT 1000
+        		LIMIT 500
         	) foo
         );
 
@@ -48,14 +48,14 @@ if( $isMySQL )
         	SELECT id FROM (
         		SELECT id FROM results
         		ORDER BY strategy_profit DESC
-        		LIMIT 5000
+        		LIMIT 500
         	) foo
         )
         AND id NOT IN (
         	SELECT id FROM (
         		SELECT id FROM results
         		ORDER BY sharpe DESC
-        		LIMIT 1000
+        		LIMIT 500
         	) foo
         );
 
