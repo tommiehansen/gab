@@ -310,7 +310,7 @@ try {
 	$profitStrategy = $report->relativeProfit;
 
 	# ...if write stuff
-	if( $profitStrategy > $profitMarket+1 )
+	if( $profitStrategy > $profitMarket+1 && $profitStrategy > 0 )
 	{
 		$strat; $report;
 
@@ -507,7 +507,7 @@ catch(Exception $e){
 
 
 /* OUTPUT */
-if( $profitStrategy > $profitMarket+1 )
+if( $profitStrategy > $profitMarket+1 && $profitStrategy > 0 )
 {
 	$calc = number_format($profitStrategy - $profitMarket) . '%';
 	$percentProfit = number_format($report->relativeProfit) . '%';
