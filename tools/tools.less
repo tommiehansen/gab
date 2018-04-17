@@ -5,6 +5,7 @@
 @spacing-double: @spacing*2;
 
 @container-width: 700px;
+@background: #111;
 
 /* ----------------- */
 
@@ -15,7 +16,7 @@
 body,html { min-height: 100%; }
 html { font-size: 62.5%; }
 body {
-    background: #111;
+    background: @background;
     color: lime;
     font-family: monospace, mono-space, sans-serif;
     padding: 4rem 5% 0 5%;
@@ -133,4 +134,70 @@ body { overflow-x: hidden; }
     33% { color: deeppink;  }
     66% { color: yellow; }
     100% { color: cyan; }
+}
+
+
+/* textarea */
+textarea, .textarea {
+    width: 100%;
+    min-height: 150px;
+    background: @background;
+    color: yellow;
+    border: 1px dashed yellow;
+    font-size: 16px;
+    font-family: monospace, mono-space, sans-serif;
+    padding: @spacing;
+    transition: all .5s ease;
+    transition-property: border, color, background;
+    line-height: 1.4;
+    display: block;
+
+    &.pink {
+        border-color: deeppink;
+        color: deeppink;
+    }
+    &.pre {
+        height: 100%;
+    }
+
+    b {
+        font-size: 4rem;
+    }
+
+    &.unvisible {
+        visibility: hidden;
+        overflow: hidden;
+        transition: none;
+    }
+
+    &:hover {
+        color: #fff;
+        border-color: #fff;
+    }
+    &:focus {
+        color: #fff;
+        border-color: cyan;
+    }
+
+}
+
+.grid--item { position: relative; vertical-align: top; }
+.grid--item textarea, .grid--item .textarea {
+    vertical-align: top;
+}
+
+
+.dollar {
+    position: relative;
+    &:after {
+		content: '$';
+		line-height: 1;
+		position: absolute;
+        color: #fff;
+		left: @spacing;
+		top: -7px;
+		background: @background;
+		padding: 0 5px;
+        z-index: 1;
+	}
 }
