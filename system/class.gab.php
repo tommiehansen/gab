@@ -318,6 +318,20 @@ class core {
 		$gc->backtest->daterange->from = $dates['from'];
 		$gc->backtest->daterange->to = $dates['to'];
 
+		# check / set paperTrader
+		if( isset( $this->conf->paperTrader ) )
+		{
+			$pt = $this->conf->paperTrader;
+			$gp = $gc->paperTrader;
+			
+			$gp->feeMaker = $pt->feeMaker;
+			$gp->feeTaker = $pt->feeTaker;
+			$gp->feeUsing = $pt->feeUsing;
+			$gp->slippage = $pt->slippage;
+			$gp->simulationBalance->asset = $pt->asset;
+			$gp->simulationBalance->currency = $pt->currency;
+		}
+
 		return $c;
 
 	} // config()

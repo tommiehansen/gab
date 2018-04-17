@@ -39,6 +39,17 @@
 			];
 		}
 
+		/* paperTrader */
+		if( isset( $paperTrader ) )
+		{
+			if( !is_array($paperTrader) )
+			{
+				die('Config ERROR: $paperTrader has errors, make sure it is correct.');
+			}
+
+			$conf['paperTrader'] = $paperTrader;
+		}
+
 		/* cache */
 		$conf['cache'] = [
 			'cache_dir' => 'cache/',
