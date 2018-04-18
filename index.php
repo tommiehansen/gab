@@ -17,6 +17,8 @@
 
 	# get exchanges and pairs
 	$datasets = $gab->get_datasets();
+
+	date_default_timezone_set('UTC');
 ?>
 
 <form method='post' action='<?php echo $conf->urls->system . 'post.php'; ?>' id='gab_selectForm'>
