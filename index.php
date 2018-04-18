@@ -18,6 +18,7 @@
 	# get exchanges and pairs
 	$datasets = $gab->get_datasets();
 
+	# force UTC timezone (else curl errors)
 	date_default_timezone_set('UTC');
 ?>
 
