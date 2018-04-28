@@ -31,14 +31,14 @@ if( $isMySQL )
         	SELECT id FROM (
         		SELECT id FROM results
         		ORDER BY strategy_profit DESC
-        		LIMIT 500
+        		LIMIT 200
         	) foo
         )
         AND id NOT IN (
         	SELECT id FROM (
         		SELECT id FROM results
         		ORDER BY sharpe DESC
-        		LIMIT 500
+        		LIMIT 200
         	) foo
         );
 
@@ -48,14 +48,14 @@ if( $isMySQL )
         	SELECT id FROM (
         		SELECT id FROM results
         		ORDER BY strategy_profit DESC
-        		LIMIT 500
+        		LIMIT 200
         	) foo
         )
         AND id NOT IN (
         	SELECT id FROM (
         		SELECT id FROM results
         		ORDER BY sharpe DESC
-        		LIMIT 500
+        		LIMIT 200
         	) foo
         );
 
@@ -112,7 +112,7 @@ else {
         // delete blobs
         $truncate = "
             DELETE FROM blobs
-            WHERE id NOT IN (SELECT id FROM results ORDER BY strategy_profit DESC LIMIT 500);
+            WHERE id NOT IN (SELECT id FROM results ORDER BY strategy_profit DESC LIMIT 200);
         ";
 
         $db->query($truncate);
@@ -120,7 +120,7 @@ else {
         // delete from results
         $truncate = "
             DELETE FROM results
-            WHERE id NOT IN (SELECT id FROM results ORDER BY strategy_profit DESC LIMIT 500);
+            WHERE id NOT IN (SELECT id FROM results ORDER BY strategy_profit DESC LIMIT 200);
         ";
 
         $db->query($truncate);
