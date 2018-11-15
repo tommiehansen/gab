@@ -142,7 +142,7 @@
 	                $list = array_values($list);
 
 	                # sort by date desc
-					if( !$isMySQL && !$oldMySQL ){
+					if( !$isMySQL && @!$oldMySQL ){
 	                	usort($list, function($a, $b) { return (float) $b['last_run'] - (float) $a['last_run']; });
 					}
 
