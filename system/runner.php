@@ -317,8 +317,8 @@ try {
 		# results
 		$r = $report;
 		$currency = $c['pair']['currency'];
-		$relativeProfit = round($r->relativeProfit);
-		$marketProfit = round($r->market);
+		$relativeProfit = explode('.', $r->relativeProfit)[0];
+		$marketProfit = explode('.', $r->market)[0];
 		$sharpe = number_format($r->sharpe, 2);
 		$numTrades = $r->trades; // note, 1x roundtrip = 1x buy + 1x sell
 		$numRoundtrips = count($get->roundtrips);
