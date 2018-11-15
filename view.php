@@ -133,6 +133,7 @@
 							$time = filemtime($conf->dirs->results . $dbs['name']);
 							$size = filesize($conf->dirs->results . $dbs['name']);
 							$list[$key]['filesize'] = sprintf("%4.2f", $size/1048576);
+							$oldMySQL = false; // need to set here
 						}
 						$list[$key]['name'] = $name;
 	                    $list[$key]['last_run'] = $time;
@@ -142,7 +143,7 @@
 	                $list = array_values($list);
 
 	                # sort by date desc
-					if( !$isMySQL && @!$oldMySQL ){
+					if( !$isMySQL && !$oldMySQL ){
 	                	usort($list, function($a, $b) { return (float) $b['last_run'] - (float) $a['last_run']; });
 					}
 
