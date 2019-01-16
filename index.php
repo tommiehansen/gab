@@ -17,6 +17,9 @@
 
 	# get exchanges and pairs
 	$datasets = $gab->get_datasets();
+
+	# force UTC timezone (else curl errors)
+	date_default_timezone_set('UTC');
 ?>
 
 <form method='post' action='<?php echo $conf->urls->system . 'post.php'; ?>' id='gab_selectForm'>
@@ -107,8 +110,10 @@
 				$from = $ranges['from'];
 				$to = $ranges['to'];
 
-				$dateFrom = date('Y-m-d', $from);
-				$dateTo = date('Y-m-d', $to);
+				$dateFullFrom = date('Y-m-d h:m', $from);
+				$dateFullTo = date('Y-m-d h:m', $to);
+				$dateFrom = substr($dateFullFrom, 0, -6);
+				$dateTo = substr($dateFullTo, 0, -6);
 
 				$diff = date_between( $dateFrom, $dateTo);
 				$niceRange = '';
@@ -141,7 +146,7 @@
 				# output rows
 				$str .= "<tr class='$selected'>";
 					$str .= '<td>';
-					$str .= "<input type='radio' name='dataset' value='$set_flat' $selected> $exchange"; // NOTE: key (ref @ later stage -- really needed? only need exchange, pair and dates etc -- no ref to internal order)
+					$str .= "<input type='radio' name='dataset' data-from='$dateFullFrom' data-to='$dateFullTo' value='$set_flat' $selected> $exchange";
 					$str .= '</td>';
 					$str .= "<td>$asset</td>";
 					$str .= "<td>$currency</td>";
@@ -169,12 +174,13 @@
 			$min = $date_fields['from'];
 			$max = $date_fields['to'];
 			$niceKey = ucfirst($key);
+			$pattern = "(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))";
 
 			$dates .= "
 				<column>
 					<label for='$key'>$niceKey <small>Y-m-d eg: 2017-12-30</small></label>
-					<div class='tip error' data-tip='Error! Match the format e.g. 2017-12-30 (Year-month-date)'>
-						<input name='$key' class='tip' data-tip='Some stuff here' type='text' value='$val' placeholder='ex: 2017-12-30' maxlength='10' minlength='10' pattern='(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))'>
+					<div class='tip error' data-tip='Error! Match the format e.g. 2017-12-30 (year-month-date)'>
+						<input name='$key' class='tip $key' data-tip='Some stuff here' type='text' value='$val' placeholder='ex: 2017-12-30' maxlength='10' minlength='10' pattern='$pattern'>
 					</div>
 				</column>
 			";

@@ -133,6 +133,7 @@
 							$time = filemtime($conf->dirs->results . $dbs['name']);
 							$size = filesize($conf->dirs->results . $dbs['name']);
 							$list[$key]['filesize'] = sprintf("%4.2f", $size/1048576);
+							$oldMySQL = false; // need to set here
 						}
 						$list[$key]['name'] = $name;
 	                    $list[$key]['last_run'] = $time;
@@ -142,7 +143,9 @@
 	                $list = array_values($list);
 
 	                # sort by date desc
-	                usort($list, function($a, $b) { return (float) $b['last_run'] - (float) $a['last_run']; });
+					if( !$isMySQL && !$oldMySQL ){
+	                	usort($list, function($a, $b) { return (float) $b['last_run'] - (float) $a['last_run']; });
+					}
 
 	                # add date
 	                foreach($list as $k => $v ){
@@ -203,7 +206,7 @@
 	                    $date = $dbs['date'];
 	                    $input = "<input name='db' value='$db_name' type='radio' $c>";
 	                    $cleanClass = $filesize > 100 ? 'red' : '';
-						$isMySQL ? $cleanLimit = '1000 with best sharpe and the 1000' : $cleanLimit = 500;
+						$isMySQL ? $cleanLimit = '200 with best sharpe and the 200' : $cleanLimit = 200;
 	                    $html .= "
 	                        <tr class='$c' rel='$dbsFile'>
 	                            <td>$input $exchange</td>
@@ -319,6 +322,11 @@
 
         $db->commit();
 		$db=null;
+
+		# check if there are profitable results
+		if( !isset($res[0]) || !isset($res[0]['market_profit'])  ){
+			$errors[] = 'You do not have any profitable runs to show, maybe run your strategy a little more to get some?';
+		}
 
 		if( $errors )
 		{

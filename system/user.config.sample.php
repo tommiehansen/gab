@@ -72,7 +72,33 @@ $allow_origin = false;
 
 
 /*
-    ADVANCED SETTINGS
+    *** PAPER TRADER SETTINGS ***
+    default: no values/not set
+
+    Change Paper Trader settings.
+    Only use if you have a really good reason since setting this
+    too low could introduce some major overfitting of data (google it).
+
+    NOTE: If you run test(s) and then change this no new dataset will
+    be created that reflects this. Use wisely.
+
+    Copy-paste this array into your config and change as you see fit:
+
+    $paperTrader = [
+        'feeMaker' => 0.25,
+        'feeTaker' => 0.25,
+        'feeUsing' => 'maker',
+        'slippage' => 0.05,
+        'asset' => 1,
+        'currency' => 100,
+    ];
+
+*/
+
+
+
+/*
+    *** ADVANCED SETTINGS ***
     Do not do this if you don't know what you're doing
 
     *** SERVER ARRAY ***

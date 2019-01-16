@@ -162,8 +162,6 @@ var gab = {
 		el.parent().find('.checked').removeClass('checked');
 		el.addClass('checked');
 
-
-
 		// check if page = run (index)
 		if( this.currentPage == 'index' )
 		{
@@ -205,12 +203,13 @@ var gab = {
 			}
 		});
 
+		let par = trs.parent();
+		par.find('#tr_noresult').remove();
+
 		if( allhidden )
 		{
-			let cols = trs.find('td').length,
-				par = trs.parent();
+			let cols = trs.find('td').length;
 
-			par.find('#tr_noresult').remove();
 			par.append('<tr id="tr_noresult"><td colspan='+ cols +'>No match</td></tr>');
 		}
 	},

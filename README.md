@@ -14,7 +14,7 @@ A conversion tool for old SQLite db's is included under the new /tools/ -folder.
 Cleaned up most stuff and optimized many more + added a lot of things 'under the hood'. A lot of changes and changes to things such as the databases etc. This make this a version _incompatible_ with the prior (first released) version.
 
 #### Why
-I needed a way to run backtests for Gekko in a 'brute-force' manor automated and with multi-threading.
+I needed a way to run backtests for Gekko in a 'brute-force' manner automated and with multi-threading.
 I also needed a way to compare all these runs and get extra data such as win% etc.
 
 ##### Prerequisites (required)

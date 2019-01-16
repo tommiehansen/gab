@@ -3,6 +3,7 @@
     require_once $conf->dirs->system . 'functions.php';
 
     $links = [
+        'Possibility check' => 'possibility_check.php|Check number of possibilities something gives you.',
         'Compatibility Fix' => 'compatibility_fix.php|New version? Try fixing old data or old just old crap',
         'Sanity Check' => 'sanitycheck.php|Debug/check your server configuration and find out if there are problems',
         'Rapid Dataset Importer' => '#|Quickly download datasets for Gekko',

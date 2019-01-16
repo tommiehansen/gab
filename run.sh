@@ -1,9 +1,8 @@
 #!/bin/bash
 clear
 
-file=$@
-set -a # export var's
-#set +m # silence background jobs (curl)
+file=$1
+set -a
 
 # check if settings.sh exists
 if [ ! -f $file ]; then
@@ -11,19 +10,30 @@ if [ ! -f $file ]; then
     echo " You have no $file file, please create an .sh file in the cli folder and try again."
     echo " Tip: Use settings.sample.sh as a template"
     echo " Note: You must use LF (unix) line endings"
-    return
+    exit
 fi
 
 if (( "$#" != 1 ))
 then
     echo " ERROR - No configuration file supplied"
     echo " Usage: . run.sh cli/your-settings.sh"
-return
+    exit
 fi
 
 
+# ask user for number of threads
+THREADS=1
+echo -n "How many threads? [1-99]: "
+read THREADS
+if [[ $THREADS -lt 1 || $THREADS -gt 99 ]]
+    then
+        echo "Bad number of threads, idiot."
+        return
+else
+    clear
+fi
 
-
+trap 'echo " exiting gab";kill $(jobs -p);exit' SIGINT
 
 # import user settings
 . $file
@@ -83,18 +93,15 @@ COUNTER=0
 MAX_COUNTER=0
 MAX_NO_RESULTS=200 # TODO ... Need a way to kill everything if NO_RESULTS_RUN > X
 
+
 runforever()
 {
-    i="0"
-    while [ $i -lt $THREADS ]
-    do
-        let "COUNTER++"
-        let "i++"
-       (
-          ./curl.sh "$(generate_post_data)" $SRC $COUNTER # outputs background job messages for no reason, need to silence
-       ) &
-    done
-    wait
+    LIMIT=$(expr $THREADS \* 2)
+    for ID in $(seq 1 $LIMIT); do
+    echo $ID; done | xargs -I{} --max-procs $THREADS bash -c "
+    ./curl.sh '$(generate_post_data)' $SRC $COUNTER {}"
+
+    COUNTER=$(expr $COUNTER + $LIMIT)
     runforever
 }
 
@@ -108,7 +115,7 @@ printf "${yel}${line}${end}\n"
 # display threads
 info="${cyn}INFO${end} >"
 set="${yel}SETTINGS${end} >"
-printf "$info Running $STRATEGY \n"
+printf "$info Running $STRATEGY using $THREADS thread(s) \n"
 printf "$info To quit hold CTRL+C \n\n"
 printf "$set \n"
 printf "    $asset / $currency @ $exchange \n"
@@ -116,17 +123,6 @@ printf "    Candle: ${candle_size} min  History: $history_size \n"
 printf "\n";
 
 
-# ask user for number of threads
-THREADS=1
-echo -n "How many threads? [1-99]: "
-read THREADS
-if [[ $THREADS -lt 1 || $THREADS -gt 99 ]]
-    then
-		echo "Bad number of threads, idiot."
-		return
-fi
-
-# display stupid text
 arr[0]=" you bloody idiot."
 arr[1]=" and let's have a nice day?"
 arr[2]=" ... hopefully it will turn out well."
@@ -134,10 +130,11 @@ arr[3]=" you piece of s*** garbabe w***!"
 arr[4]="! Maybe drink some coffee and go watch the sun?"
 arr[5]="! This is a great time to go do other things."
 arr[6]=" and while it runs let's spam Tommie Hansen with random questions."
+arr[7]="! Lambo generator started."
 
-rand=$(( RANDOM % 7 ))
+rand=$(( RANDOM % 8 ))
 
-printf "\nLet's go${arr[$rand]} \n\n"
+printf "Let's go${arr[$rand]} \n\n"
 
 
 # init

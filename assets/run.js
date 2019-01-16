@@ -35,16 +35,24 @@ dates.on('blur', 'input', function(){
 function dateMask( el )
 {
 	let val = el.value,
-			len = val.length,
-			key = event.keyCode;
+		len = val.length,
+        curKey = event.keyCode;
 
-	// dash = return (prevent double dash)
-	if( key == 8 ) return true;
+    // prevent bad key input
+    if( curKey > 57 && !event.ctrlKey ){
+        event.preventDefault();
+    }
 
-	// auto-add dashes
-	if( len === 4 && key !== 189 || len === 7 && key !== 189 ) { el.value += '-'; }
-	else if( len === 5 && val[len-1] !== '-' ) el.value = val.slice(0, -1) + '-';
-	else if( len === 8 && val[len-1] !== '-' ) el.value = val.slice(0, -1) + '-';
+    // 0-9 = min: 48 max: 57
+    if( curKey > 47 ){
+        switch( len )
+        {
+            case 4:
+            case 7:
+                el.value = val + '-';
+                break;
+        }
+    }
 }
 
 function dateCheck( el ){
@@ -61,8 +69,8 @@ function dateCheck( el ){
 }
 
 // enable mask
-dates.on('keyup', 'input', function(){
-    dateMask(this);
+dates.on('keydown', 'input', function(){
+    dateMask(this, true);
 });
 
 
@@ -227,14 +235,50 @@ f.on('submit', function(e){
 
     // VARs
     var $t = $(this),
-        serialized = $t.find('input,textarea,select').not('.hidden').serialize(), // exclude hidden inputs from POST
         form_url = $t.prop('action'),
         timeout = $('#ajax_timeout')[0].value * 60000,
         noResultRuns = 0, // reset
         threads = f.find('#threads')[0].value,
-        sub = $('#submit');
+        sub = $('#submit'),
+        datasets = $('#datasets'),
+        dates = datasets.find('#dates');
 
     form_url_orig = form_url; // save for later use
+
+    /*
+        Check if input date is start-date for dataset
+        must compare and if start-date = dataset startdate we must add hour:minute
+    */
+    var curDataset = datasets.find('tr.checked').find('input'),
+        oldDataset = curDataset.val(),
+        json = JSON.parse( oldDataset ),
+        dateFromJson = json.from,
+        dateToJson = json.to,
+        dateFrom = dates.find('.from').val(),
+        dateTo = dates.find('.to').val();
+
+    // check and modify the JSON
+    let hasStart = false;
+    if( dateFrom.indexOf(dateFromJson) > -1 ){
+        json.from = curDataset.data('from');
+        hasStart = true;
+    }
+    else { json.from = dateFrom; }
+    if( dateTo.indexOf(dateToJson) > -1 ){
+        json.to = curDataset.data('to');
+        hasStart = true;
+    }
+    else { json.to = dateTo; }
+
+    if( hasStart ){ curDataset.val(JSON.stringify(json)); }
+
+    /* serialize form */
+    var serialized = $t.find('input,textarea,select').not('.hidden').serialize(); // exclude hidden inputs from POST
+
+    // restore old dataset
+    if( hasStart ){
+        curDataset.val(oldDataset);
+    }
 
     // check if debug mode
     if( $('#debug').data('debug') === 'true' ){
