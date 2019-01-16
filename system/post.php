@@ -42,9 +42,22 @@
         $dateFrom = _P('from');
         $dateTo = _P('to');
         $ds = json_decode($dataset);
-        #prp($ds);
-        $ds->from = _P('from');
-        $ds->to = _P('to');
+
+
+        $from = $ds->from;
+        $to = $ds->to;
+
+        // check string length (user might send timestamp)
+        // only modify if it isn't a timestamp included
+        if( strlen($from) < 12 ){
+            $ds->from = _P('from');
+        }
+
+        if( strlen($to) < 12 )
+        {
+            $ds->to = _P('to');
+        }
+
         $dataset = json_encode($ds);
     }
 
@@ -103,6 +116,8 @@
             // TODO: make a function out of this
 
             // shuffle and get first from shuffled
+            shuffle($range);
+            shuffle($range);
             shuffle($range);
             $range = $range[0];
 
