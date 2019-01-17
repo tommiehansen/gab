@@ -7,7 +7,7 @@
 	$_POST ...
 */
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 
 require_once 'conf.php';
 require_once $conf->dirs->system . 'functions.php';
@@ -30,7 +30,6 @@ else {
 	die('No strategy was set to be used. Cannot run.');
 }
 
-#print_r($_POST);
 
 /* 2 - get strategy default params */
 $strat_name = _P('strategy_name');
@@ -41,17 +40,14 @@ $settings = json_decode(_P('dataset'));
 
 @$strat = [ $strat_name => $gab->get_strategies()[$strat_name] ]; // returns array
 
-if( !$strat[$strat_name] ) die('Runner.php ERROR: Could not find strategy or it does not have a valid TOML file, server down or bad files?');
+if( !$strat[$strat_name] ) {
+    die('Runner.php ERROR: Could not find strategy or it does not have a valid TOML file, server down or bad files? Did you try to clear the cache?');
+}
 
 # ..then set if params set
 foreach($strat_post as $key => $val ){
 	$strat[$strat_name][$key] = $val;
 }
-
-#prp($strat); exit;
-#prp($settings); exit;
-#prph("settings\n\n");
-#prp($settings);
 
 /* 3 - get overall params */
 # NOTE: Gekko doesn't seem to accept date format ?!, needsfix
@@ -292,10 +288,11 @@ if( $curl->status !== 200 )
 $get = json_decode($curl->data);
 
 # check if decoding worked
-if( !$get )
+if( !$get || ! is_object($get))
 {
 	$str = "Runner.php ERROR: JSON decode did not work.\n";
 	$str .= "url: $url | curl status: " . $curl->status . "\n";
+	$str .= "Did you clear the cache after adding a new strat?";
 	die($str);
 }
 
@@ -305,7 +302,7 @@ unset($get->candles);
 try {
 
 	/* 7 - check if strategy beat market */
-	$report = $get->report;
+	$report = $get->performanceReport;
 	$profitMarket = $report->market;
 	$profitStrategy = $report->relativeProfit;
 
@@ -533,5 +530,5 @@ if( $conf->multiserver )
 }
 
 echo $str;
-unset($db);
-exit;
+//unset($db);
+//exit;

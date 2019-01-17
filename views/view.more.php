@@ -189,6 +189,12 @@
     $str = $gab->create_toml($strat[0]);
 
     echo "<hr><h4 id='more_strategy'>Strategy params</h4><p>All the parameters stored</p>";
+    echo "<h5>TOML</h5>";
+    echo "<form><textarea onfocus='this.select();' onclick='gab.autoSizeTextarea(this)' style='min-height:320px'>$str</textarea></form>";
+
+    $str = json_encode($strat[0],JSON_PRETTY_PRINT);
+
+    echo "<h5>JSON</h5>";
     echo "<form><textarea onfocus='this.select();' onclick='gab.autoSizeTextarea(this)' style='min-height:320px'>$str</textarea></form>";
 
     echo "
@@ -230,10 +236,22 @@
         echo "<tr>";
         foreach( $arr as $k => $v ){
             $orig = $v;
+
             if( $k == 'id' || $k == 'pnl' ) continue;
             if( contains('00Z', $v) ) { $v = substr(tdate($v), 0, 16); }
+            if ('entryAt' == $k || 'exitAt' == $k) $v = date('Y-m-d H:i',$v);
+
             if( $k == 'duration' ) $v = secondsToHuman($v/1000);
-            if( is_numeric($v) ) $v = number_format($v, 2);
+
+            if( is_numeric($v) ) {
+                if ('entryPrice' == $k || 'exitPrice' == $k) {
+                    $v = number_format($v, 8);
+                } else {
+                    $v = number_format($v, 2);
+
+                }
+
+            }
             if( $k == 'profit' ) {
                 if( contains('-', $v) ){
                     $v = '<span class="negative">' . $v . '%</span>';

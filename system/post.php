@@ -117,6 +117,8 @@
 
             // shuffle and get first from shuffled
             shuffle($range);
+            shuffle($range);
+            shuffle($range);
             $range = $range[0];
 
             // put back at line

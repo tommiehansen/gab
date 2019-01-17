@@ -231,7 +231,7 @@ class core {
 		// define all params
 		$c = [
 
-			'gekkoConfig' => [
+//			'gekkoConfig' => [
 
 				# should change
 				'watch' => [
@@ -269,7 +269,7 @@ class core {
 					'feeMaker' => 0.25,
 					'feeTaker' => 0.25,
 					'feeUsing' => 'maker',
-					'slippage' => 0.05,
+					'slippage' => 0.1,
 					'simulationBalance' => [
 						'asset' => 1,
 						'currency' => 100
@@ -278,16 +278,19 @@ class core {
 					'enabled' => 1,
 				],
 
-			], // gekkoConfig
+//			], // gekkoConfig
 
-			'data' => [
-				'candleProps' => 0, // 0 = disable, else ['close','start']
-				'indicatorResults' => 0, // 0 or 1 (does nothing?)
-				'report' => 1,
-				'roundtrips' => 1, // set to 1 to get all roundtrips
-				'trader' => 0, // does nothing?
-			],
-
+            'backtestResultExporter' => [
+                'enabled' => 1,
+                'writeToDisk' => 0,
+                'data' => [
+                    'stratUpdates' => 0,
+                    'roundtrips' => 1,
+                    'stratCandles' => 0,
+                    'stratCandleProps' => ['open'],
+                    'trades' =>1
+                ]
+            ]
 		];
 
 
@@ -296,33 +299,34 @@ class core {
 		$s = $settings;
 
 		# set values
-		$gc = $c->gekkoConfig;
-		$watch = $gc->watch;
+		$watch = $c->watch;
 
 		$watch->exchange = $s['pair']['exchange'];
 		$watch->currency = $s['pair']['currency'];
 		$watch->asset = $s['pair']['asset'];
 
-		$strategyName = key($s['strategy']);
-		$gc->$strategyName = $s['strategy'][$strategyName];
+//		reset($s['strategy']);
+		$strategyName = array_keys($s['strategy'])[0];
+
+        $c->{$strategyName} = $s['strategy'][$strategyName];
 
 		# set tradingAdvisor
-		$gc->tradingAdvisor->method = $strategyName;
+        $c->tradingAdvisor->method = $strategyName;
 
 		# set time related stuff
 		$timing = $s['timing'];
-		$gc->tradingAdvisor->candleSize = $timing['candleSize'];
-		$gc->tradingAdvisor->historySize = $timing['historySize'];
+        $c->tradingAdvisor->candleSize = $timing['candleSize'];
+        $c->tradingAdvisor->historySize = $timing['historySize'];
 
 		$dates = $timing['daterange'];
-		$gc->backtest->daterange->from = $dates['from'];
-		$gc->backtest->daterange->to = $dates['to'];
+        $c->backtest->daterange->from = $dates['from'];
+        $c->backtest->daterange->to = $dates['to'];
 
 		# check / set paperTrader
 		if( isset( $this->conf->paperTrader ) )
 		{
 			$pt = $this->conf->paperTrader;
-			$gp = $gc->paperTrader;
+			$gp = $c->paperTrader;
 			
 			$gp->feeMaker = $pt->feeMaker;
 			$gp->feeTaker = $pt->feeTaker;
@@ -331,7 +335,6 @@ class core {
 			$gp->simulationBalance->asset = $pt->asset;
 			$gp->simulationBalance->currency = $pt->currency;
 		}
-
 		return $c;
 
 	} // config()
