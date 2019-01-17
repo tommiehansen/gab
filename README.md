@@ -4,6 +4,11 @@ Gekko Automated Backtests
 *** **THIS IS BETA** ***
 
 If something does not work, it simply does not work since time hasn't existed yet to get it working.
+###### Compatibility Updates
+17/01 2019
+
+Gekko has been updated to work with the latest major branch of gekko (v0.6.x)
+
 
 ###### Breaking changes
 14/4 2018
